@@ -1,5 +1,5 @@
 import { Fragment } from 'react';
-import toast from 'react-hot-toast';
+import toast, { Toaster } from 'react-hot-toast';
 import { FaExclamationTriangle } from 'react-icons/fa';
 
 interface LogoutModalProps {
@@ -28,6 +28,18 @@ const LogoutModal = ({ isOpen, onClose }: LogoutModalProps) => {
 
   return (
     <Fragment>
+            <Toaster
+        position="top-right"
+        toastOptions={{
+          style: {
+            background: "#7a4522",
+            color: "#fff",
+            borderRadius: "10px",
+            padding: "16px",
+          },
+          duration: 2000,
+        }}
+      />
       {/* پس‌زمینه مودال */}
       <div
         className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] transition-opacity duration-300"

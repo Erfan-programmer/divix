@@ -141,7 +141,7 @@ const RegisterPage = () => {
             <img
               src="/images/header_image.jpg"
               alt="ورود به حساب کاربری"
-              className="object-cover"
+              className="object-cover h-full"
             />
             <div className="absolute inset-0 bg-[#432818]/60 flex items-center justify-center p-8">
               <div className="text-white text-center">

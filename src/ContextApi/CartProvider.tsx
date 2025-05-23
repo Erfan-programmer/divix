@@ -134,7 +134,9 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
         if (data.success) {
           await fetchCart();
           toast.success("محصول با موفقیت از سبد خرید حذف شد");
-        } else {
+        }
+
+        else {
           toast.error(data.message || "خطا در حذف محصول");
         }
         return;
@@ -157,8 +159,11 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
         }),
       });
 
+      if (response.status === 422) {
+        toast.error('تعداد محصول در انبار تمام شده است');
+        return;
+      }
       const data = await response.json();
-
       if (data.success) {
         await fetchCart();
         toast.success("تعداد محصول با موفقیت بروزرسانی شد");
@@ -218,7 +223,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
         if (data.result.id !== localStorage.getItem("cart-id") as null) {
           localStorage.setItem("cart-id", data.result.id.toString());
         }
-   
+
         if (onSuccess) {
           onSuccess(data);
         }

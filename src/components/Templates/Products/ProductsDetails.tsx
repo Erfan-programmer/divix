@@ -12,7 +12,7 @@ import {
 import { FaStar, FaChevronLeft } from "react-icons/fa";
 import { Link } from "react-router-dom";
 
-import { toast } from "react-hot-toast";
+import { toast, Toaster } from "react-hot-toast";
 import {
   Accordion,
   AccordionSummary,
@@ -27,7 +27,7 @@ import { useParams } from "react-router-dom";
 import { useCart } from "../../../ContextApi/CartProvider";
 import { addToCart, removeFromCart, updateCartItemQuantity } from "./../../../utils/Cart"
 
-const StyledAccordion = styled(Accordion)(({  }) => ({
+const StyledAccordion = styled(Accordion)(({ }) => ({
   border: "1px solid #fff1cc",
   borderRadius: "0.5rem",
   marginBottom: "1rem",
@@ -36,14 +36,14 @@ const StyledAccordion = styled(Accordion)(({  }) => ({
   },
 })) as typeof Accordion;
 
-const StyledAccordionSummary = styled(AccordionSummary)(({  }) => ({
+const StyledAccordionSummary = styled(AccordionSummary)(({ }) => ({
   padding: "1rem",
   "& .MuiAccordionSummary-content": {
     margin: 0,
   },
 })) as typeof AccordionSummary;
 
-const StyledAccordionDetails = styled(AccordionDetails)(({  }) => ({
+const StyledAccordionDetails = styled(AccordionDetails)(({ }) => ({
   padding: "1rem",
   borderTop: "1px solid #fff1cc",
 })) as typeof AccordionDetails;
@@ -292,7 +292,7 @@ const ReviewForm = ({
                 onChange={(_, newValue) => {
                   setRating(newValue || 0);
                 }}
-           
+
                 icon={<FaStar size={24} color="#7a4522" />}
                 emptyIcon={<FaRegStar size={24} color="#7a4522" />}
                 sx={{
@@ -622,7 +622,7 @@ const ProductDetailsSkeleton = () => (
 
 export default function ProductsDetails() {
   const [quantity, setQuantity] = useState(0);
-  const {id} = useParams();
+  const { id } = useParams();
   const [cartCounts, setCartCounts] = useState<{ [key: number]: number }>({});
   const [productData, setProductData] = useState<ExtendedProductData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -725,9 +725,9 @@ export default function ProductsDetails() {
             dateAdded: new Date().toISOString(),
             discount: firstPrice?.discount || 0,
           });
-        setIsLoading(false);
+          setIsLoading(false);
 
-        } 
+        }
       } catch (err) {
       } finally {
         setIsLoading(false);
@@ -946,7 +946,7 @@ export default function ProductsDetails() {
       });
 
       const data = await response.json();
-      if (data.error_code === 403) {
+      if (response.status === 422) {
         toast.error('تعداد محصول در انبار تمام شده است');
         return;
       }
@@ -1027,6 +1027,18 @@ export default function ProductsDetails() {
 
   return (
     <div className="container mx-auto px-4 py-4 md:py-8">
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          style: {
+            background: "#7a4522",
+            color: "#fff",
+            borderRadius: "10px",
+            padding: "16px",
+          },
+          duration: 2000,
+        }}
+      />
       {isLoading ? (
         <ProductDetailsSkeleton />
       ) : (
@@ -1091,10 +1103,10 @@ export default function ProductsDetails() {
                       {group.name}:
                     </h3>
                     <div className={`flex flex-wrap gap-4 ${group.type === "color"
-                        ? "justify-start"
-                        : group.type === "size"
-                          ? "justify-center"
-                          : "justify-end"
+                      ? "justify-start"
+                      : group.type === "size"
+                        ? "justify-center"
+                        : "justify-end"
                       }`}>
                       {getUniqueAttributes(group.name).map((attrName) => {
                         const price = productData?.prices.find((p) =>
@@ -1115,19 +1127,19 @@ export default function ProductsDetails() {
                               setSelectedPrice(price || null);
                             }}
                             className={`transition-all duration-300 ${group.type === "color"
-                                ? `w-10 h-10 rounded-full shadow-md hover:shadow-lg ${selectedAttributes[group.name] === attrName
-                                  ? "ring-4 ring-[#7a4522] ring-offset-2 scale-110"
-                                  : "hover:scale-105"
+                              ? `w-10 h-10 rounded-full shadow-md hover:shadow-lg ${selectedAttributes[group.name] === attrName
+                                ? "ring-4 ring-[#7a4522] ring-offset-2 scale-110"
+                                : "hover:scale-105"
+                              }`
+                              : group.type === "size"
+                                ? `w-12 h-12 rounded-lg border-2 font-bold text-lg ${selectedAttributes[group.name] === attrName
+                                  ? "border-[#7a4522] bg-[#fff1cc] text-[#7a4522] shadow-md"
+                                  : "border-[#e5e7eb] hover:border-[#7a4522] hover:bg-[#fff1cc]/20 text-[#4b5563] hover:text-[#7a4522]"
                                 }`
-                                : group.type === "size"
-                                  ? `w-12 h-12 rounded-lg border-2 font-bold text-lg ${selectedAttributes[group.name] === attrName
-                                    ? "border-[#7a4522] bg-[#fff1cc] text-[#7a4522] shadow-md"
-                                    : "border-[#e5e7eb] hover:border-[#7a4522] hover:bg-[#fff1cc]/20 text-[#4b5563] hover:text-[#7a4522]"
-                                  }`
-                                  : `px-5 py-2.5 rounded-xl border-2 font-medium text-sm md:text-base ${selectedAttributes[group.name] === attrName
-                                    ? "border-[#7a4522] bg-[#fff1cc] text-[#7a4522] shadow-md"
-                                    : "border-[#e5e7eb] hover:border-[#7a4522] hover:bg-[#fff1cc]/20 text-[#4b5563] hover:text-[#7a4522]"
-                                  }`
+                                : `px-5 py-2.5 rounded-xl border-2 font-medium text-sm md:text-base ${selectedAttributes[group.name] === attrName
+                                  ? "border-[#7a4522] bg-[#fff1cc] text-[#7a4522] shadow-md"
+                                  : "border-[#e5e7eb] hover:border-[#7a4522] hover:bg-[#fff1cc]/20 text-[#4b5563] hover:text-[#7a4522]"
+                                }`
                               }`}
                             style={
                               group.type === "color" && attr
