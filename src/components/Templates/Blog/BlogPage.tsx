@@ -55,7 +55,7 @@ export default function BlogPage() {
                     params.set('search', searchQuery);
                 }
 
-                const response = await fetch(`https://admin.mydivix.com/api/v1/posts?${params}&page=${currentPage}&per_page=${paginationMeta.per_page}`);
+                const response = await fetch(`https://admin.mydivix.com/api/v1/posts?${params}&page=${currentPage}&per_page=10`);
                 const data = await response.json();
 
                 if (data.success) {

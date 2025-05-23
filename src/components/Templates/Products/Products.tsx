@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import ProductTopBar from "../../Modules/Products/ProductTopBar";
 import ProductCard from "../../Modules/Home/ProductCard";
-import { FaFilter } from "react-icons/fa";
+import { FaFilter, FaSpinner } from "react-icons/fa";
 import Breadcrumb from "../../Modules/Breadcrumb";
 import { Checkbox } from "@mui/material";
 
@@ -262,6 +262,7 @@ const ProductsPage = () => {
       const response = await fetch(`https://admin.mydivix.com/api/v1/categories/${categoryId}/filter`);
       const data = await response.json();
       
+      console.log(data)
       if (data.success) {
         setFilters(data.result);
       } else {
@@ -491,28 +492,21 @@ const ProductsPage = () => {
           )}
 
           {/* Products Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {isLoading ? (
-              // Loading skeleton
-              Array.from({ length: 6 }).map((_, index) => (
-                <div key={index} className="bg-white rounded-xl p-4 animate-pulse">
-                  <div className="h-48 bg-gray-200 rounded-lg mb-4"></div>
-                  <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-                  <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-                </div>
-              ))
-            ) : error ? (
-              <div className="col-span-full text-center text-red-500 py-8">{error}</div>
-            ) : products.length === 0 ? (
-              <div className="col-span-full text-center py-8">
-                <p className="text-gray-500">محصولی یافت نشد</p>
-              </div>
-            ) : (
-              products.map((product) => (
+          {isLoading ? (
+            <div className="flex items-center justify-center min-h-[400px]">
+              <FaSpinner className="text-[#7A4522] text-4xl animate-spin" />
+            </div>
+          ) : products.length === 0 ? (
+            <div className="text-center py-8">
+              <p className="text-[#7A4522]/70">نتیجه‌ای یافت نشد</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {products.map((product) => (
                 <ProductCard key={product.id} product={product} />
-              ))
-            )}
-          </div>
+              ))}
+            </div>
+          )}
 
           {/* Pagination */}
           {paginationLinks.length > 0 && (

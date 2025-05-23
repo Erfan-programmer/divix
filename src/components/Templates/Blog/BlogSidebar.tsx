@@ -36,20 +36,20 @@ const BlogSidebar: React.FC<BlogSidebarProps> = ({ onSearch }) => {
       {/* بخش جستجو */}
       <div className="bg-white rounded-2xl shadow-lg p-6">
         <h3 className="text-lg font-bold text-[#432818] mb-4">جستجو در مقالات</h3>
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => {
-              handleFormSubmit(e);
-              if (e.target.value.length < 3) {
-                setError('لطفا حداقل 3 حرف وارد کنید');
-              } else {
-                setError(null);
-              }
-            }}
-            placeholder="حداقل 3 حرف وارد کنید..."
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#432818] focus:border-transparent"
-          />
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={(e) => {
+            handleFormSubmit(e);
+            if (e.target.value.length < 3) {
+              setError('لطفا حداقل 3 حرف وارد کنید');
+            } else {
+              setError(null);
+            }
+          }}
+          placeholder="حداقل 3 حرف وارد کنید..."
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#432818] focus:border-transparent"
+        />
         {error && (
           <p className="text-red-500 text-sm mt-2">{error}</p>
         )}
@@ -77,8 +77,6 @@ const BlogSidebar: React.FC<BlogSidebarProps> = ({ onSearch }) => {
             </Link>
           ))}
         </div>
-      ) : searchQuery && !isSearching && !error ? (
-        <p className="text-sm text-gray-500 text-center">نتیجه‌ای یافت نشد</p>
       ) : null}
     </div>
   );
