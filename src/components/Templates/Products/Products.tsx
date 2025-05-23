@@ -3,134 +3,9 @@ import ProductTopBar from "../../Modules/Products/ProductTopBar";
 import ProductCard from "../../Modules/Home/ProductCard";
 import { FaFilter } from "react-icons/fa";
 import Breadcrumb from "../../Modules/Breadcrumb";
-import { NormalizeText } from "../../Modules/NormalizeText";
 import { Checkbox } from "@mui/material";
 
 import { useNavigate, useSearchParams } from "react-router-dom";
-
-const sampleProducts = [
-  {
-    id: "1",
-    name: "کیف چرم طبیعی",
-    price: 1200000,
-    image: "/images/header_image.jpg",
-    category: "کیف",
-    brand: "برند A",
-    color: "قهوه‌ای",
-    leatherType: "چرم طبیعی",
-  },
-  {
-    id: "2",
-    name: "کفش چرم مردانه",
-    price: 1800000,
-    image: "/images/header_image.jpg",
-    category: "کفش",
-    brand: "برند B",
-    color: "مشکی",
-    leatherType: "چرم طبیعی",
-  },
-  {
-    id: "3",
-    name: "کیف پول چرم",
-    price: 650000,
-    image: "/images/header_image.jpg",
-    category: "کیف پول",
-    brand: "برند C",
-    color: "قهوه‌ای",
-    leatherType: "چرم مصنوعی",
-  },
-  {
-    id: "4",
-    name: "کمربند چرم",
-    price: 450000,
-    image: "/images/header_image.jpg",
-    category: "کمربند",
-    brand: "برند A",
-    color: "مشکی",
-    leatherType: "چرم طبیعی",
-  },
-  {
-    id: "5",
-    name: "دستبند چرم",
-    price: 350000,
-    image: "/images/header_image.jpg",
-    category: "دستبند",
-    brand: "برند B",
-    color: "قهوه‌ای",
-    leatherType: "چرم ورنی",
-  },
-  {
-    id: "6",
-    name: "ساک دستی چرم",
-    price: 950000,
-    image: "/images/header_image.jpg",
-    category: "ساک دستی",
-    brand: "برند C",
-    color: "کرم",
-    leatherType: "چرم نوباک",
-  },
-  {
-    id: "6",
-    name: "ساک دستی چرم",
-    price: 950000,
-    image: "/images/header_image.jpg",
-    category: "ساک دستی",
-    brand: "برند C",
-    color: "کرم",
-    leatherType: "چرم نوباک",
-  },
-  {
-    id: "6",
-    name: "ساک دستی چرم",
-    price: 950000,
-    image: "/images/header_image.jpg",
-    category: "ساک دستی",
-    brand: "برند C",
-    color: "کرم",
-    leatherType: "چرم نوباک",
-  },
-  {
-    id: "6",
-    name: "ساک دستی چرم",
-    price: 950000,
-    image: "/images/header_image.jpg",
-    category: "ساک دستی",
-    brand: "برند C",
-    color: "کرم",
-    leatherType: "چرم نوباک",
-  },
-  {
-    id: "6",
-    name: "ساک دستی چرم",
-    price: 950000,
-    image: "/images/header_image.jpg",
-    category: "ساک دستی",
-    brand: "برند C",
-    color: "کرم",
-    leatherType: "چرم نوباک",
-  },
-  {
-    id: "6",
-    name: "ساک دستی چرم",
-    price: 950000,
-    image: "/images/header_image.jpg",
-    category: "ساک دستی",
-    brand: "برند C",
-    color: "کرم",
-    leatherType: "چرم نوباک",
-  },
-  {
-    id: "6",
-    name: "ساک دستی چرم",
-    price: 950000,
-    image: "/images/header_image.jpg",
-    category: "ساک دستی",
-    brand: "برند C",
-    color: "کرم",
-    leatherType: "چرم نوباک",
-  },
-];
-
 export interface Product {
   id: number;
   title: string;
@@ -169,8 +44,6 @@ interface ProductsResponse {
   };
 }
 
-// تعداد محصولات در هر صفحه
-const ITEMS_PER_PAGE = 6;
 
 interface SubCategory {
   id: number;
@@ -248,52 +121,6 @@ const ProductsPage = () => {
     navigate(`/products?${params.toString()}`);
   };
 
-  const findRelatedCategories = (
-    categorySlug: string
-  ): { parents: string[]; children: string[] } => {
-    // پیدا کردن دسته‌بندی اصلی
-    const mainCategory = categories.find(
-      (cat) =>
-        NormalizeText(cat.slug) === NormalizeText(categorySlug) ||
-        NormalizeText(cat.title) === NormalizeText(categorySlug)
-    );
-
-    // پیدا کردن به عنوان زیردسته
-    let parentCategory: Category | undefined;
-    let isSubCategory = false;
-
-    for (const cat of categories) {
-      const subCat = cat.categories.find(
-        (sub) =>
-          NormalizeText(sub.slug) === NormalizeText(categorySlug) ||
-          NormalizeText(sub.title) === NormalizeText(categorySlug)
-      );
-      if (subCat) {
-        parentCategory = cat;
-        isSubCategory = true;
-        break;
-      }
-    }
-
-    if (mainCategory) {
-      // اگر parent باشد
-      return {
-        parents: [NormalizeText(mainCategory.title)],
-        children: mainCategory.categories.map((sub) =>
-          NormalizeText(sub.title)
-        ),
-      };
-    } else if (isSubCategory && parentCategory) {
-      // اگر child باشد
-      return {
-        parents: [NormalizeText(parentCategory.title)],
-        children: [categorySlug.replace(/-/g, " ")].map(NormalizeText),
-      };
-    }
-
-    return { parents: [], children: [] };
-  };
-
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const categoryFromUrl = params.get("category");
@@ -301,9 +128,6 @@ const ProductsPage = () => {
     if (!categoryFromUrl) {
       return;
     }
-
-
-
 
   }, [products, location.search, categories]);
 

@@ -8,13 +8,6 @@ import {
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 
-// نوع داده برای تیکت
-interface Ticket {
-  id: number;
-  title: string;
-  status: "open" | "in_progress" | "closed";
-  created_at: string;
-}
 
 // نوع داده برای محصول مورد علاقه
 interface FavoriteProduct {

@@ -167,17 +167,7 @@ const Profile = () => {
           // دریافت شهرهای استان انتخاب شده
           await fetchCities(province.id);
           
-          // انتخاب شهر کاربر
-          if (userData.address.city) {
-            const city: City = {
-              id: userData.address.city.id,
-              name: userData.address.city.name,
-              name_en: userData.address.city.name_en,
-              latitude: userData.address.city.latitude || "",
-              longitude: userData.address.city.longitude || "",
-              ordering: userData.address.city.ordering || 0
-            };
-          }
+        
         }
       }
     } catch (error) {
@@ -305,7 +295,6 @@ const Profile = () => {
 
   const handleCityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const cityId = e.target.value;
-    const city = cities.find(c => c.id.toString() === cityId);
     setFormData(prev => ({
       ...prev,
       city_id: cityId
