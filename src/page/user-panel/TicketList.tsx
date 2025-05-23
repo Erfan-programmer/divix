@@ -101,7 +101,7 @@ export const TicketList = () => {
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold text-[#7A4522]">تیکت‌های من</h2>
           <Link
-            to="/user-panel/tickets"
+            to="/user-panel/tickets/send"
             className="bg-[#7A4522] text-white px-4 py-2 rounded-lg hover:bg-[#5A3418] transition-colors"
           >
             ارسال تیکت جدید
