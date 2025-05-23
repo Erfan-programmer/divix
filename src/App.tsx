@@ -24,6 +24,9 @@ import Favorites from "./page/user-panel/Favorites";
 import UserPanelLayout from "./components/Layout/UserPanel";
 import ThankYou from "./page/Checkbox/ThankYou";
 import ScrollToTop from "./components/Modules/ScrollToTop";
+import TicketList from "./page/user-panel/TicketList";
+import SendTicket from "./page/user-panel/SendTicket";
+import { TicketDetail } from "./page/user-panel/TicketDetail";
 
 function App() {
   return (
@@ -55,6 +58,9 @@ function App() {
                   <Route path="profile" element={<Profile />} />
                   <Route path="orders" element={<Orders />} />
                   <Route path="favorites" element={<Favorites />} />
+                  <Route path="tickets" element={<SendTicket />} />
+                  <Route path="tickets/send" element={<TicketList />} />
+                  <Route path="tickets/:ticketId" element={<TicketDetail />} />
                 </Route>
                 {/* user panel */}
               </Route>

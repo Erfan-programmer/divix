@@ -41,12 +41,12 @@ const ticketItems = [
   {
     title: "تیکت جدید",
     icon: <FaPlus className="w-5 h-5" />,
-    href: "/user-panel/ticket/send",
+    href: "/user-panel/tickets/send",
   },
   {
     title: "لیست تیکت‌ها",
     icon: <FaList className="w-5 h-5" />,
-    href: "/user-panel/ticket/list",
+    href: "/user-panel/tickets/list",
   },
 ];
 
