@@ -264,7 +264,7 @@ export default function BlogDetail() {
                   <img
                     src={post.image}
                     alt={post.title}
-                    className="object-cover"
+                    className="object-cover w-full h-full"
                   />
                 </div>
 

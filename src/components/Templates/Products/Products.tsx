@@ -3,7 +3,7 @@ import ProductTopBar from "../../Modules/Products/ProductTopBar";
 import ProductCard from "../../Modules/Home/ProductCard";
 import { FaFilter, FaSpinner } from "react-icons/fa";
 import Breadcrumb from "../../Modules/Breadcrumb";
-import { Checkbox } from "@mui/material";
+import { Checkbox, Slider } from "@mui/material";
 
 import { useNavigate, useSearchParams } from "react-router-dom";
 export interface Product {
@@ -66,10 +66,12 @@ interface Category {
 }
 
 interface Filter {
-  id: number;
-  name: string;
-  type: string;
-  values: {
+  attributes: any[];
+  price_range: {
+    min: number;
+    max: number;
+  };
+  brands: {
     id: number;
     name: string;
     count: number;
@@ -97,9 +99,15 @@ const ProductsPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [openCategories, setOpenCategories] = useState<number[]>([]);
-  const [filters, setFilters] = useState<Filter[]>([]);
+  const [filters, setFilters] = useState<Filter>({
+    attributes: [],
+    price_range: { min: 0, max: 0 },
+    brands: []
+  });
   const [isLoadingFilters, setIsLoadingFilters] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 0]);
+  const [selectedBrands, setSelectedBrands] = useState<number[]>([]);
 
   const handleFilterChange = (filterId: number, valueId: number) => {
     setSelectedFilters(prev => {
@@ -253,7 +261,11 @@ const ProductsPage = () => {
 
   const fetchCategoryFilters = async (categoryId: string) => {
     if (!categoryId) {
-      setFilters([]);
+      setFilters({
+        attributes: [],
+        price_range: { min: 0, max: 0 },
+        brands: []
+      });
       return;
     }
 
@@ -264,7 +276,7 @@ const ProductsPage = () => {
       
       console.log(data)
       if (data.success) {
-        setFilters(data.result);
+        setFilters(data);
       } else {
         console.error("خطا در دریافت فیلترها:", data.message);
       }
@@ -280,6 +292,18 @@ const ProductsPage = () => {
       fetchCategoryFilters(selectedCategory);
     }
   }, [selectedCategory]);
+
+  const handlePriceChange = (event: Event, newValue: number | number[]) => {
+    setPriceRange(newValue as [number, number]);
+  };
+
+  const handleBrandChange = (brandId: number) => {
+    setSelectedBrands(prev => 
+      prev.includes(brandId)
+        ? prev.filter(id => id !== brandId)
+        : [...prev, brandId]
+    );
+  };
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -433,30 +457,103 @@ const ProductsPage = () => {
                   </div>
                 ))
               ) : (
-                filters.map((filter) => (
-                  <div key={filter.id} className="space-y-3">
-                    <h4 className="font-medium text-[#432818]">{filter.name}</h4>
-                    <div className="space-y-2">
-                      {filter.values.map((value) => (
-                        <label
-                          key={value.id}
-                          className="flex items-center gap-2 cursor-pointer group"
-                        >
-                          <input
-                            type="checkbox"
-                            checked={(selectedFilters[filter.id] || []).includes(value.id)}
-                            onChange={() => handleFilterChange(filter.id, value.id)}
-                            className="w-4 h-4 rounded border-[#7A4522]/50 text-[#7A4522] focus:ring-[#7A4522]"
-                          />
-                          <span className="text-sm text-gray-600 group-hover:text-[#7A4522] transition-colors">
-                            {value.name}
-                          </span>
-                          <span className="text-xs text-gray-400">({value.count})</span>
-                        </label>
-                      ))}
+                <>
+                  {/* Price Range Slider */}
+                  {filters.price_range && (
+                    <div className="space-y-4 bg-white p-4 rounded-lg border border-[#7A4522]/10">
+                      <h4 className="font-medium text-[#432818]">محدوده قیمت</h4>
+                      <div className="px-2">
+                        <Slider
+                          value={priceRange}
+                          onChange={handlePriceChange}
+                          valueLabelDisplay="auto"
+                          min={filters.price_range.min}
+                          max={filters.price_range.max}
+                          sx={{
+                            color: '#7A4522',
+                            height: 4,
+                            '& .MuiSlider-thumb': {
+                              width: 20,
+                              height: 20,
+                              backgroundColor: '#fff',
+                              border: '2px solid #7A4522',
+                              '&:hover, &.Mui-focusVisible': {
+                                boxShadow: '0 0 0 8px rgba(122, 69, 34, 0.16)',
+                              },
+                              '&.Mui-active': {
+                                width: 24,
+                                height: 24,
+                              },
+                            },
+                            '& .MuiSlider-track': {
+                              height: 4,
+                              backgroundColor: '#7A4522',
+                            },
+                            '& .MuiSlider-rail': {
+                              height: 4,
+                              backgroundColor: '#7A4522',
+                              opacity: 0.2,
+                            },
+                            '& .MuiSlider-valueLabel': {
+                              backgroundColor: '#7A4522',
+                              padding: '4px 8px',
+                              borderRadius: '4px',
+                              fontSize: '12px',
+                              fontWeight: 'bold',
+                              '&:before': {
+                                display: 'none',
+                              },
+                            },
+                          }}
+                        />
+                        <div className="flex justify-between mt-4">
+                          <div className="flex flex-col items-center">
+                            <span className="text-xs text-gray-500 mb-1">حداقل</span>
+                            <span className="text-sm font-medium text-[#7A4522] bg-[#FFF8E7] px-3 py-1 rounded-full">
+                              {priceRange[0].toLocaleString()} تومان
+                            </span>
+                          </div>
+                          <div className="flex flex-col items-center">
+                            <span className="text-xs text-gray-500 mb-1">حداکثر</span>
+                            <span className="text-sm font-medium text-[#7A4522] bg-[#FFF8E7] px-3 py-1 rounded-full">
+                              {priceRange[1].toLocaleString()} تومان
+                            </span>
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                ))
+                  )}
+
+                  {/* Brands */}
+                  {filters.brands && filters.brands.length > 0 && (
+                    <div className="space-y-3">
+                      <h4 className="font-medium text-[#432818]">برندها</h4>
+                      <div className="space-y-2">
+                        {filters.brands.map((brand) => (
+                          <label
+                            key={brand.id}
+                            className="flex items-center justify-between p-2 rounded-lg cursor-pointer transition-colors hover:bg-gray-100"
+                          >
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm text-gray-600">{brand.name}</span>
+                              <span className="text-xs text-gray-400">({brand.count})</span>
+                            </div>
+                            <Checkbox
+                              sx={{
+                                color: '#7A4522',
+                                '&.Mui-checked': {
+                                  color: '#7A4522',
+                                },
+                              }}
+                              checked={selectedBrands.includes(brand.id)}
+                              onChange={() => handleBrandChange(brand.id)}
+                            />
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </>
               )}
             </div>
           )}
@@ -493,15 +590,27 @@ const ProductsPage = () => {
 
           {/* Products Grid */}
           {isLoading ? (
-            <div className="flex items-center justify-center min-h-[400px]">
-              <FaSpinner className="text-[#7A4522] text-4xl animate-spin" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {Array.from({ length: 6 }).map((_, index) => (
+                <div key={index} className="bg-white rounded-xl p-4 animate-pulse">
+                  <div className="h-48 bg-gray-200 rounded-lg mb-4"></div>
+                  <div className="space-y-3">
+                    <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                    <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                    <div className="flex justify-between items-center">
+                      <div className="h-6 bg-gray-200 rounded w-1/4"></div>
+                      <div className="h-6 bg-gray-200 rounded w-1/4"></div>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           ) : products.length === 0 ? (
             <div className="text-center py-8">
               <p className="text-[#7A4522]/70">نتیجه‌ای یافت نشد</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3  gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {products.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}
