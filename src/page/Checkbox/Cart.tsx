@@ -152,6 +152,11 @@ export default function ChechoutCart() {
         }),
       });
 
+      if (response.status === 422) {
+        toast.error('تعداد محصول در انبار تمام شده است');
+        return;
+      }
+
       const data = await response.json();
 
       if (data.success) {

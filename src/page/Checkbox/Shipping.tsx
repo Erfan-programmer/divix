@@ -34,22 +34,6 @@ export interface CartProduct {
   seller: string;
 }
 
-// interface CartResponse {
-//   success: boolean;
-//   message: string;
-//   result: {
-//     id: number;
-//     cart_id: string;
-//     discount_id: number | null;
-//     total_discount: number;
-//     shipping_cost: string;
-//     shipping_cost_amount: number;
-//     final_price: number;
-//     weight: number;
-//     products: CartProduct[];
-//   }
-// }
-
 interface Province {
   id: number;
   name: string;
