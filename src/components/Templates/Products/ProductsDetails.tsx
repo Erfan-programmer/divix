@@ -128,19 +128,19 @@ const accordionItems: AccordionItem[] = [
     id: "details",
     question: "جزئیات محصول",
     type: "text",
-    content: sampleProduct.details,
+    content: sampleProduct?.details,
   },
   {
     id: "specs",
     question: "مشخصات فنی",
     type: "text",
-    content: sampleProduct.specifications,
+    content: sampleProduct?.specifications,
   },
   {
     id: "reviews",
     question: "نظرات کاربران",
     type: "reviews",
-    content: sampleProduct.reviews,
+    content: sampleProduct?.reviews,
   },
 ];
 
@@ -1415,30 +1415,30 @@ export default function ProductsDetails() {
                   </div>
                 ))}
               </div>
-            ) : relatedProducts.length > 0 ? (
+            ) : relatedProducts?.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                {relatedProducts.map((product) => (
+                {relatedProducts?.map((product) => (
                   <Link
-                    key={product.id}
-                    to={`/products/${product.id}`}
+                    key={product?.id}
+                    to={`/products/${product?.id}`}
                     className="bg-white rounded-xl p-4 hover:shadow-lg transition-shadow"
                   >
                     <div className="aspect-square relative rounded-lg overflow-hidden mb-4">
                       <img
-                        src={product.image || "/images/placeholder.jpg"}
-                        alt={product.title}
+                        src={product?.image || "/images/placeholder.jpg"}
+                        alt={product?.title}
                         className="object-cover"
                       />
                     </div>
                     <h3 className="font-bold text-[#432818] mb-2 line-clamp-2">
-                      {product.title}
+                      {product?.title}
                     </h3>
                     <div className="flex items-center justify-between">
                       <span className="text-[#7a4522] font-bold">
-                        {product.price.toLocaleString()} تومان
+                        {product?.price.toLocaleString()} تومان
                       </span>
                       <span className="text-sm text-gray-500">
-                        {product.category.title}
+                        {product?.category.title}
                       </span>
                     </div>
                   </Link>
