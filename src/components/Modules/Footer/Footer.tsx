@@ -20,7 +20,7 @@ const Footer = () => {
   };
 
   return (
-    <footer className="bg-[#fff1cc] text-[#7a4522] shadow-lg">
+    <footer className="bg-[#fff1cc] text-[#7a4522] shadow-lg mt-10">
       <div className=" py-8">
         <div className="container">
           <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-8 sm:gap-6">
