@@ -58,8 +58,8 @@ function App() {
                   <Route path="profile" element={<Profile />} />
                   <Route path="orders" element={<Orders />} />
                   <Route path="favorites" element={<Favorites />} />
-                  <Route path="tickets" element={<SendTicket />} />
-                  <Route path="tickets/send" element={<TicketList />} />
+                  <Route path="tickets" element={<TicketList />} />
+                  <Route path="tickets/send" element={<SendTicket />} />
                   <Route path="tickets/:ticketId" element={<TicketDetail />} />
                 </Route>
                 {/* user panel */}
