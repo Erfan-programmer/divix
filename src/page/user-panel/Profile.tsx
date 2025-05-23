@@ -1,12 +1,9 @@
-"use client";
-
 import { useEffect, useState } from "react";
 import {
   FaUser,
   FaEnvelope,
   FaPhone,
   FaMapMarkerAlt,
-  FaCamera,
   FaLock,
   FaEye,
   FaEyeSlash,
@@ -47,10 +44,6 @@ const Profile = () => {
     confirmPassword: "",
   });
 
-  const [profileImage, setProfileImage] = useState(
-    "/images/default-avatar.png"
-  );
-
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -58,7 +51,6 @@ const Profile = () => {
   const [provinces, setProvinces] = useState<Province[]>([]);
   const [cities, setCities] = useState<City[]>([]);
   const [selectedProvince, setSelectedProvince] = useState<Province | null>(null);
-  const [selectedCity, setSelectedCity] = useState<City | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -133,11 +125,6 @@ const Profile = () => {
     }
   };
 
-  const handlePasswordSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Password updated:", passwordData);
-  };
-
   const breadcrumbItems = [
     { title: "پنل کاربری", href: "/user-panel" },
     { title: "پروفایل" },
@@ -190,7 +177,6 @@ const Profile = () => {
               longitude: userData.address.city.longitude || "",
               ordering: userData.address.city.ordering || 0
             };
-            setSelectedCity(city);
           }
         }
       }
@@ -303,7 +289,6 @@ const Profile = () => {
     const provinceId = e.target.value;
     const province = provinces.find(p => p.id.toString() === provinceId);
     setSelectedProvince(province || null);
-    setSelectedCity(null);
     setFormData(prev => ({
       ...prev,
       province_id: provinceId,
@@ -321,7 +306,6 @@ const Profile = () => {
   const handleCityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const cityId = e.target.value;
     const city = cities.find(c => c.id.toString() === cityId);
-    setSelectedCity(city || null);
     setFormData(prev => ({
       ...prev,
       city_id: cityId

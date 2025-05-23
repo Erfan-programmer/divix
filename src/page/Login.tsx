@@ -6,24 +6,16 @@ import "react-toastify/dist/ReactToastify.css";
 import { FaPhone } from "react-icons/fa6";
 const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     username: "",
     password: "",
     device_name: "iPhone 12",
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-    setErrors({});
 
     try {
       const response = await fetch("https://admin.mydivix.com/api/v1/login", {
@@ -38,7 +30,6 @@ const LoginPage = () => {
       console.log(data);
       if (!response.ok) {
         if (data.errors) {
-          setErrors(data.errors);
           toast.error("لطفا اطلاعات را به درستی وارد کنید", {
             position: "top-right",
             autoClose: 5000,
@@ -89,9 +80,7 @@ const LoginPage = () => {
         progress: undefined,
         theme: "dark",
       });
-    } finally {
-      setIsLoading(false);
-    }
+    } 
   };
 
   return (

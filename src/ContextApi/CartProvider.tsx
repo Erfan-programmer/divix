@@ -187,7 +187,6 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
   const fetchCart = useCallback(async (options: FetchCartOptions = {}) => {
     const {
       showToast = false,
-      updateLocalStorage = true,
       onSuccess,
       onError,
     } = options;

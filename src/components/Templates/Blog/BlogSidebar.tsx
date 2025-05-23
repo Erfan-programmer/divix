@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { FaSearch } from 'react-icons/fa';
 import { Link } from "react-router-dom";
 import moment from 'moment-jalaali';
 
@@ -16,8 +15,8 @@ interface BlogSidebarProps {
 
 const BlogSidebar: React.FC<BlogSidebarProps> = ({ onSearch }) => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
-  const [isSearching, setIsSearching] = useState(false);
+  const [searchResults] = useState<SearchResult[]>([]);
+  const [isSearching] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleFormSubmit = (e: React.ChangeEvent<HTMLInputElement>) => {

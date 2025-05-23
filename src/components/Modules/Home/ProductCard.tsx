@@ -1,10 +1,6 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   FaHeart,
-  FaShoppingCart,
-  FaTrash,
-  FaPlus,
-  FaMinus,
   FaRegHeart,
 } from "react-icons/fa";
 import { Link } from "react-router-dom";
@@ -21,42 +17,14 @@ interface ProductCardProps {
 export default function ProductCard({
   product,
   is_favorite = false,
-  onAddToCart,
   onToggleFavorite,
 }: ProductCardProps) {
-  const [quantity, setQuantity] = useState(0);
   const [isFavorite, setIsFavorite] = useState(is_favorite);
   const [isLoading, setIsLoading] = useState(false);
 
   if (!product) {
     return null;
   }
-
-  const handleAddToCart = () => {
-    if (quantity === 0) {
-      setQuantity(1);
-      onAddToCart?.(1);
-    }
-  };
-
-  const handleIncrement = () => {
-    const newQuantity = quantity + 1;
-    setQuantity(newQuantity);
-    onAddToCart?.(newQuantity);
-  };
-
-  const handleDecrement = () => {
-    if (quantity > 0) {
-      const newQuantity = quantity - 1;
-      setQuantity(newQuantity);
-      onAddToCart?.(newQuantity);
-    }
-  };
-
-  const handleRemove = () => {
-    setQuantity(0);
-    onAddToCart?.(0);
-  };
 
   const handleAddToHeart = async () => {
     if (isLoading) return;

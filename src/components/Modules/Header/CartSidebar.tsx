@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { FaTimes, FaShoppingCart, FaPlus, FaMinus, FaTrash } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import type { CartProduct } from "../../../ContextApi/CartProvider";

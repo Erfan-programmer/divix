@@ -16,7 +16,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { toast, Toaster } from 'react-hot-toast';
 
 // استایل سفارشی برای آکاردئون
-const StyledAccordion = styled(Accordion)(({ theme }) => ({
+const StyledAccordion = styled(Accordion)(({  }) => ({
   backgroundColor: '#FFF1CC',
   color: '#7A4522',
   borderRadius: '12px !important',
@@ -52,7 +52,7 @@ const StyledAccordionDetails = styled(AccordionDetails)({
   fontFamily: 'IRANYekan',
 });
 
-const MapSkeleton = styled(Skeleton)(({ theme }) => ({
+const MapSkeleton = styled(Skeleton)(({  }) => ({
   height: '100%',
   minHeight: '300px',
   borderRadius: '12px',
@@ -92,7 +92,7 @@ const ContactPage = () => {
   const [isMapLoading, setIsMapLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleAccordionChange = (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
+  const handleAccordionChange = (panel: string) => (_: React.SyntheticEvent, isExpanded: boolean) => {
     setExpanded(isExpanded ? panel : false);
   };
 

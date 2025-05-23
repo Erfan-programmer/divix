@@ -1,5 +1,3 @@
-"use client";
-
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
@@ -17,7 +15,6 @@ import { Toaster } from "react-hot-toast";
 
 const RegisterPage = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -38,7 +35,6 @@ const RegisterPage = () => {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setErrors({});
     console.log(formData);
 
     try {
@@ -58,7 +54,6 @@ const RegisterPage = () => {
 
       if (!response.ok) {
         if (data.errors) {
-          setErrors(data.errors);
           toast.error("لطفا اطلاعات را به درستی وارد کنید", {
             position: "top-right",
             autoClose: 5000,

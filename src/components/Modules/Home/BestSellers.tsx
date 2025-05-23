@@ -1,7 +1,5 @@
-"use client";
-
 import {Link} from "react-router-dom";
-import { FaShoppingCart, FaHeart, FaArrowLeft } from "react-icons/fa";
+import {  FaArrowLeft } from "react-icons/fa";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Autoplay, EffectCards } from "swiper/modules";
 import ProductCard from "./ProductCard";

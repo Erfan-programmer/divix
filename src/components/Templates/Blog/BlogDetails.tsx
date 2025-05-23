@@ -1,5 +1,3 @@
-"use client";
-
 import {
   FaCalendar,
   FaUser,
@@ -82,7 +80,6 @@ export default function BlogDetail() {
     body: "",
   });
   const [shareUrl, setShareUrl] = useState("");
-  const [isCopied, setIsCopied] = useState(false);
   const {id} = useParams()
   useEffect(() => {
     const fetchPost = async () => {
@@ -158,9 +155,7 @@ export default function BlogDetail() {
     navigator.clipboard
       .writeText(shareUrl)
       .then(() => {
-        setIsCopied(true);
         setTimeout(() => {
-          setIsCopied(false);
         }, 2000);
       })
       .catch((error) => {

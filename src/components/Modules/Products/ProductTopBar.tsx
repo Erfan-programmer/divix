@@ -1,5 +1,4 @@
 import React from "react";
-import { FaFilter } from "react-icons/fa";
 
 interface ProductTopBarProps {
   totalProducts: number;

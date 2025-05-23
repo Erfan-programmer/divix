@@ -1,4 +1,3 @@
-"use client";
 import { useEffect, useState } from "react";
 import ProductTopBar from "../../Modules/Products/ProductTopBar";
 import ProductCard from "../../Modules/Home/ProductCard";
@@ -209,8 +208,6 @@ const ProductsPage = () => {
   const searchParams = useSearchParams()
   const [selectedFilters, setSelectedFilters] = useState<Record<number, number[]>>({});
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [sortBy, setSortBy] = useState("newest");
-  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [totalItems, setTotalItems] = useState(0);
   const [fromItem, setFromItem] = useState<number>(0);
   const [toItem, setToItem] = useState<number>(0);
@@ -223,7 +220,6 @@ const ProductsPage = () => {
     }[]
   >([]);
   const [products, setProducts] = useState<Product[]>([]);
-  const [page, setPage] = useState(1);
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -247,7 +243,6 @@ const ProductsPage = () => {
   };
 
   const handleSortChange = (value: string) => {
-    setSortBy(value);
     const params = new URLSearchParams(searchParams[0]);
     params.set('sort', value);
     navigate(`/products?${params.toString()}`);
@@ -304,30 +299,12 @@ const ProductsPage = () => {
     const categoryFromUrl = params.get("category");
 
     if (!categoryFromUrl) {
-      setFilteredProducts(products);
       return;
     }
 
-    const { parents, children } = findRelatedCategories(
-      categoryFromUrl.replace(/-/g, " ")
-    );
 
-    const filtered = products.filter((product) => {
-      const normalizedProductCategory = NormalizeText(product.category);
-      const matchesParent = parents.some(
-        (parent) =>
-          normalizedProductCategory.includes(parent) ||
-          parent.includes(normalizedProductCategory)
-      );
-      const matchesChild = children.some(
-        (child) =>
-          normalizedProductCategory.includes(child) ||
-          child.includes(normalizedProductCategory)
-      );
-      return matchesParent || matchesChild;
-    });
 
-    setFilteredProducts(filtered);
+
   }, [products, location.search, categories]);
 
   useEffect(() => {
@@ -360,7 +337,6 @@ const ProductsPage = () => {
   };
 
   // محاسبه تعداد صفحات
-  const totalPages = Math.ceil(sampleProducts.length / ITEMS_PER_PAGE);
 
   const handleSearch = (query: string) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -421,7 +397,6 @@ const ProductsPage = () => {
           setFromItem(data.result.meta.from);
           setToItem(data.result.meta.to);
           setSearchQuery(searchFromUrl || "");
-          setSortBy(sortFromUrl || 'newest');
         } else {
           setError("خطا در دریافت محصولات");
         }

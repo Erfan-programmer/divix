@@ -1,5 +1,3 @@
-"use client";
-
 import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
@@ -45,13 +43,6 @@ export interface CartProduct {
   is_special: boolean;
 }
 
-interface FetchCartOptions {
-  showToast?: boolean;
-
-  updateLocalStorage?: boolean;
-  onSuccess?: (data: CartResponse) => void;
-  onError?: (error: string) => void;
-}
 export interface CartResponse {
   success: boolean;
   message: string;
@@ -126,11 +117,6 @@ const Header = () => {
   const [menus, setMenus] = useState<Menu[]>([]);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const [activeCategory, setActiveCategory] = useState(0);
-  const [error, setError] = useState<string | null>(null);
-  const [cartSummary, setCartSummary] = useState<CartResponse["result"] | null>(
-    null
-  );
-  const [searchType, setSearchType] = useState<'products' | 'posts'>('products');
   const [isSearching, setIsSearching] = useState(false);
 
   const fetchCategories = async () => {

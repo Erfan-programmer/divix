@@ -1,4 +1,3 @@
-"use client";
 import React, { useState, useRef, useEffect } from "react";
 import {
   FaMinus,
@@ -20,7 +19,6 @@ import {
   AccordionDetails,
   Typography,
   styled,
-  Avatar,
   Rating,
   TextField,
   Button,
@@ -29,7 +27,7 @@ import { useParams } from "react-router-dom";
 import { useCart } from "../../../ContextApi/CartProvider";
 import { addToCart, removeFromCart, updateCartItemQuantity } from "./../../../utils/Cart"
 
-const StyledAccordion = styled(Accordion)(({ theme }) => ({
+const StyledAccordion = styled(Accordion)(({  }) => ({
   border: "1px solid #fff1cc",
   borderRadius: "0.5rem",
   marginBottom: "1rem",
@@ -38,14 +36,14 @@ const StyledAccordion = styled(Accordion)(({ theme }) => ({
   },
 })) as typeof Accordion;
 
-const StyledAccordionSummary = styled(AccordionSummary)(({ theme }) => ({
+const StyledAccordionSummary = styled(AccordionSummary)(({  }) => ({
   padding: "1rem",
   "& .MuiAccordionSummary-content": {
     margin: 0,
   },
 })) as typeof AccordionSummary;
 
-const StyledAccordionDetails = styled(AccordionDetails)(({ theme }) => ({
+const StyledAccordionDetails = styled(AccordionDetails)(({  }) => ({
   padding: "1rem",
   borderTop: "1px solid #fff1cc",
 })) as typeof AccordionDetails;
@@ -249,16 +247,6 @@ const ReviewForm = ({
   const [disadvantages, setDisadvantages] = useState<string[]>([]);
   const [newAdvantage, setNewAdvantage] = useState("");
   const [newDisadvantage, setNewDisadvantage] = useState("");
-  const [hover, setHover] = useState(-1);
-
-  const labels: { [index: string]: string } = {
-    0: "بدون امتیاز",
-    1: "ضعیف",
-    2: "متوسط",
-    3: "خوب",
-    4: "خیلی خوب",
-    5: "عالی",
-  };
 
   const handleAddAdvantage = () => {
     if (newAdvantage.trim()) {
@@ -301,12 +289,10 @@ const ReviewForm = ({
               <Rating
                 value={rating}
                 precision={1}
-                onChange={(event, newValue) => {
+                onChange={(_, newValue) => {
                   setRating(newValue || 0);
                 }}
-                onChangeActive={(event, newHover) => {
-                  setHover(newHover);
-                }}
+           
                 icon={<FaStar size={24} color="#7a4522" />}
                 emptyIcon={<FaRegStar size={24} color="#7a4522" />}
                 sx={{
@@ -635,13 +621,11 @@ const ProductDetailsSkeleton = () => (
 );
 
 export default function ProductsDetails() {
-  const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(0);
   const {id} = useParams();
   const [cartCounts, setCartCounts] = useState<{ [key: number]: number }>({});
   const [productData, setProductData] = useState<ExtendedProductData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [expanded, setExpanded] = useState<string | false>(false);
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
@@ -651,10 +635,6 @@ export default function ProductsDetails() {
     [key: string]: string;
   }>({});
   const [availablePrices, setAvailablePrices] = useState<Price[]>([]);
-  const [newReview, setNewReview] = useState({
-    rating: 0,
-    comment: "",
-  });
   const { fetchCart, cartData } = useCart();
   const reviewFormRef = useRef<HTMLDivElement>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
@@ -747,12 +727,8 @@ export default function ProductsDetails() {
           });
         setIsLoading(false);
 
-          setError(null);
-        } else {
-          setError(data.message || "خطا در دریافت اطلاعات محصول");
-        }
+        } 
       } catch (err) {
-        setError("خطا در ارتباط با سرور");
       } finally {
         setIsLoading(false);
       }
@@ -821,7 +797,7 @@ export default function ProductsDetails() {
     setQuantity(0);
   };
 
-  const handleAccordionChange = (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
+  const handleAccordionChange = (panel: string) => (_: React.SyntheticEvent, isExpanded: boolean) => {
     setExpanded(isExpanded ? panel : false);
 
     // اگر پنل نظرات باز شد، نظرات را دریافت کن
@@ -1079,7 +1055,6 @@ export default function ProductsDetails() {
                   <div
                     key={image.id}
                     className={`relative h-[20vh] md:h-[30vh] md:h-[60vh] cursor-pointer`}
-                    onClick={() => setSelectedImage(index)}
                   >
                     <img
                       src={image.image}

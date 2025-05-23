@@ -1,5 +1,3 @@
-"use client";
-
 import { FaAngleLeft } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import Breadcrumb from "../../Modules/Breadcrumb";
@@ -36,8 +34,7 @@ export default function BlogPage() {
     const breadcrumbItems = [{ title: "وبلاگ" }];
 
     const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-    const [currentPage, setCurrentPage] = useState(1);
+    const [currentPage] = useState(1);
     const [paginationMeta, setPaginationMeta] = useState<PaginationMeta>({
         current_page: 1,
         last_page: 1,
@@ -71,11 +68,9 @@ export default function BlogPage() {
                     });
                     setIsLoading(false);
                 } else {
-                    setError('خطا در دریافت مقالات');
                     setIsLoading(false);
                 }
             } catch (err) {
-                setError('خطا در ارتباط با سرور');
                 setIsLoading(false);
             }
         };

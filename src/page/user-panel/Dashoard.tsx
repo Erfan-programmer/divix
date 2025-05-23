@@ -1,12 +1,7 @@
-"use client";
-
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
-  FaTicketAlt,
   FaHeart,
   FaShoppingBag,
-  FaEye,
-  FaPlus,
   FaChevronLeft,
   FaUser,
 } from "react-icons/fa";
@@ -41,47 +36,12 @@ interface Order {
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const [recentTickets, setRecentTickets] = useState<Ticket[]>([]);
   const [favoriteProducts, setFavoriteProducts] = useState<FavoriteProduct[]>(
     []
   );
   const [recentOrders, setRecentOrders] = useState<Order[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  const fetchRecentTickets = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      const response = await fetch(
-        "https://admin.mydivix.com/api/v1/tickets?per_page=3",
-        {
-          headers: {
-            accept: "application/json",
-            "x-api-key": "9anHzmriziuiUjNcwICqB7b1MDJa6xV3uQzOmZWy",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      if (response.status === 401) {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        navigate("/login");
-        return;
-      }
-
-      if (!response.ok) {
-        throw new Error("خطا در دریافت تیکت‌ها");
-      }
-
-      const data = await response.json();
-      if (data.success) {
-        setRecentTickets(data.result.data);
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "خطا در دریافت تیکت‌ها");
-    }
-  };
 
   const fetchFavoriteProducts = async () => {
     try {

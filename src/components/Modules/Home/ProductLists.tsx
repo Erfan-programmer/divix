@@ -1,4 +1,4 @@
-import { FaShoppingCart, FaHeart, FaArrowLeft } from "react-icons/fa";
+import { FaArrowLeft } from "react-icons/fa";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, EffectCards, Navigation } from "swiper/modules";
 import { Link } from "react-router-dom";

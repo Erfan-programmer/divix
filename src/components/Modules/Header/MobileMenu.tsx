@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { FaUser, FaTimes, FaAngleLeft, FaAngleRight } from "react-icons/fa";
-import { useCart } from "./../../../ContextApi/CartProvider";
+import { FaUser, FaTimes, FaAngleLeft } from "react-icons/fa";
 
 interface Category {
   id: number;
@@ -117,7 +116,6 @@ const MobileMenu = ({
   const [activeSubCategory, setActiveSubCategory] = useState<number | null>(
     null
   );
-  const { cartData } = useCart();
 
   const isActiveRoute = (path: string) => {
     if (path === "/products" || path === "/product") {

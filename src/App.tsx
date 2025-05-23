@@ -3,7 +3,6 @@ import {
   BrowserRouter as Router,
   Routes,
   Route,
-  Navigate,
 } from "react-router-dom";
 import MainLayout from "./components/Layout/MainLayout";
 import { CartProvider } from "./ContextApi/CartProvider";

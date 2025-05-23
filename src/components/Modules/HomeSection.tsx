@@ -35,6 +35,74 @@ const features = [
   },
 ];
 
+// کامپوننت اسکلتون لودینگ
+const SkeletonLoader = () => {
+  return (
+    <div className="mt-6 sm:mt-8 md:mt-10 space-y-12 sm:space-y-14 md:space-y-16">
+      {/* اسکلتون بنرها */}
+      <section className="py-6 sm:py-8">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+            {[1, 2].map((item) => (
+              <div key={item} className="relative overflow-hidden rounded-xl sm:rounded-2xl">
+                <div className="w-full h-[200px] sm:h-[250px] md:h-[300px] bg-[#FFF8E7] animate-pulse" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* اسکلتون دسته‌بندی‌ها */}
+      <section className="py-8 sm:py-10 md:py-12 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="flex justify-center items-center gap-2 mb-6 sm:mb-8">
+            <div className="w-8 h-8 bg-[#FFF8E7] rounded-full animate-pulse" />
+            <div className="w-48 h-8 bg-[#FFF8E7] rounded-lg animate-pulse" />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
+            {[1, 2, 3].map((item) => (
+              <div key={item} className="relative overflow-hidden rounded-xl sm:rounded-2xl shadow-lg">
+                <div className="w-full h-[200px] sm:h-[250px] md:h-[300px] bg-[#FFF8E7] animate-pulse" />
+                <div className="absolute bottom-0 right-0 p-4 sm:p-5 md:p-6 w-full">
+                  <div className="w-32 h-6 bg-white/20 rounded-lg animate-pulse mb-2" />
+                  <div className="space-y-2">
+                    {[1, 2, 3].map((subItem) => (
+                      <div key={subItem} className="w-24 h-4 bg-white/20 rounded-lg animate-pulse" />
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* اسکلتون ویژگی‌ها */}
+      <section className="bg-white py-10 sm:py-12 md:py-16">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-8 sm:mb-10 md:mb-12">
+            <div className="w-64 h-8 bg-[#FFF8E7] rounded-lg animate-pulse mx-auto mb-3" />
+            <div className="w-96 h-4 bg-[#FFF8E7] rounded-lg animate-pulse mx-auto" />
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
+            {[1, 2, 3, 4].map((item) => (
+              <div key={item} className="bg-[#F3C1A0] p-4 sm:p-5 md:p-6 rounded-xl sm:rounded-2xl">
+                <div className="flex items-start gap-3 sm:gap-4">
+                  <div className="w-12 h-12 bg-[#FFF1CC] rounded-full animate-pulse" />
+                  <div className="flex-1">
+                    <div className="w-32 h-6 bg-[#FFF1CC] rounded-lg animate-pulse mb-2" />
+                    <div className="w-full h-4 bg-[#FFF1CC] rounded-lg animate-pulse" />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+};
+
 export default function HomeSections() {
   const [banners, setBanners] = useState([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -92,6 +160,10 @@ export default function HomeSections() {
   useEffect(() => {
     fetchCategories()
   }, [])
+
+  if (isLoading) {
+    return <SkeletonLoader />;
+  }
 
   return (
     <div className="mt-6 sm:mt-8 md:mt-10 space-y-12 sm:space-y-14 md:space-y-16">
