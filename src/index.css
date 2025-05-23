@@ -1,0 +1,9 @@
+@import "tailwindcss";
+@font-face {
+    font-family: IranYekan;
+    src: url(/fonts/IRANYekanRegular.ttf);
+}
+
+html{
+    font-family: IranYekan !important;
+}
