@@ -7,7 +7,6 @@ import {
   FaRegStar,
   FaTrash,
   FaUser,
-  FaTimes
 } from "react-icons/fa";
 import { FaStar, FaChevronLeft } from "react-icons/fa";
 import { Link } from "react-router-dom";
@@ -144,25 +143,51 @@ const accordionItems: AccordionItem[] = [
   },
 ];
 
+const ReviewStatus = {
+  PENDING: "pending",
+  APPROVED: "approved",
+  REJECTED: "rejected"
+} as const;
+
+type ReviewStatusType = typeof ReviewStatus[keyof typeof ReviewStatus];
+
 interface Review {
   id: number;
+  user_id: number;
+  product_id: number;
+  title: string;
+  body: string;
   rating: number;
-  comment: string;
-  advantages: string[];
-  disadvantages: string[];
+  suggest: string | null;
+  status: ReviewStatusType;
+  created_at: string;
+  updated_at: string;
   user: {
     id: number;
-    name: string;
+    first_name: string;
+    last_name: string;
+    profile_photo_url: string;
   };
-  created_at: string;
 }
 
 interface ReviewResponse {
-  success: boolean;
-  message: string;
-  result: {
-    data: Review[];
-  };
+  current_page: number;
+  data: Review[];
+  first_page_url: string;
+  from: number;
+  last_page: number;
+  last_page_url: string;
+  links: {
+    url: string | null;
+    label: string;
+    active: boolean;
+  }[];
+  next_page_url: string | null;
+  path: string;
+  per_page: number;
+  prev_page_url: string | null;
+  to: number;
+  total: number;
 }
 
 const ReviewItem = ({ review }: { review: Review }) => (
@@ -174,7 +199,9 @@ const ReviewItem = ({ review }: { review: Review }) => (
       <div className="flex-1">
         <div className="flex items-center justify-between mb-2">
           <div>
-            <h4 className="font-bold text-[#171717]">{review.user.name}</h4>
+            <h4 className="font-bold text-[#171717]">
+              {review.user.first_name} {review.user.last_name}
+            </h4>
             <span className="text-sm text-[#473e39]">
               {new Date(review.created_at).toLocaleDateString('fa-IR')}
             </span>
@@ -194,32 +221,12 @@ const ReviewItem = ({ review }: { review: Review }) => (
             }}
           />
         </div>
-        <p className="text-[#473e39] text-sm leading-6 mb-3">{review.comment}</p>
-
-        {/* مزایا و معایب */}
-        {(review.advantages.length > 0 || review.disadvantages.length > 0) && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
-            {review.advantages.length > 0 && (
-              <div>
-                <h5 className="text-sm font-bold text-green-600 mb-2">مزایا:</h5>
-                <ul className="list-disc list-inside space-y-1">
-                  {review.advantages.map((advantage, index) => (
-                    <li key={index} className="text-sm text-[#473e39]">{advantage}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
-            {review.disadvantages.length > 0 && (
-              <div>
-                <h5 className="text-sm font-bold text-red-600 mb-2">معایب:</h5>
-                <ul className="list-disc list-inside space-y-1">
-                  {review.disadvantages.map((disadvantage, index) => (
-                    <li key={index} className="text-sm text-[#473e39]">{disadvantage}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
-          </div>
+        <h5 className="font-bold text-[#171717] mb-2">{review.title}</h5>
+        <p className="text-[#473e39] text-sm leading-6 mb-3">{review.body}</p>
+        {review.status === ReviewStatus.PENDING && (
+          <span className="inline-block px-2 py-1 text-xs bg-yellow-100 text-yellow-800 rounded-full">
+            در انتظار تایید
+          </span>
         )}
       </div>
     </div>
@@ -884,12 +891,7 @@ export default function ProductsDetails() {
       );
 
       const data: ReviewResponse = await response.json();
-
-      if (data.success) {
-        setReviews(data.result.data);
-      } else {
-        setReviewsError(data.message || 'خطا در دریافت نظرات');
-      }
+      setReviews(data.data);
     } catch (err) {
       setReviewsError('خطا در ارتباط با سرور');
     } finally {
