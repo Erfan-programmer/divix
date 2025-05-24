@@ -227,9 +227,8 @@ const ReviewItem = ({ review }: { review: Review }) => (
 );
 
 interface SubmitReviewRequest {
-  comment: string;
-  advantages: string[];
-  disadvantages: string[];
+  title: string;
+  body: string;
   rating: number;
 }
 
@@ -240,34 +239,9 @@ const ReviewForm = ({
   onSubmit: (review: SubmitReviewRequest) => void;
   onCancel: () => void;
 }) => {
-  const [comment, setComment] = useState("");
-  const [advantages, setAdvantages] = useState<string[]>([]);
-  const [disadvantages, setDisadvantages] = useState<string[]>([]);
-  const [newAdvantage, setNewAdvantage] = useState("");
-  const [newDisadvantage, setNewDisadvantage] = useState("");
+  const [title, setTitle] = useState("");
+  const [body, setBody] = useState("");
   const [rating, setRating] = useState(0);
-
-  const handleAddAdvantage = () => {
-    if (newAdvantage.trim()) {
-      setAdvantages([...advantages, newAdvantage.trim()]);
-      setNewAdvantage("");
-    }
-  };
-
-  const handleRemoveAdvantage = (index: number) => {
-    setAdvantages(advantages.filter((_, i) => i !== index));
-  };
-
-  const handleAddDisadvantage = () => {
-    if (newDisadvantage.trim()) {
-      setDisadvantages([...disadvantages, newDisadvantage.trim()]);
-      setNewDisadvantage("");
-    }
-  };
-
-  const handleRemoveDisadvantage = (index: number) => {
-    setDisadvantages(disadvantages.filter((_, i) => i !== index));
-  };
 
   return (
     <div className="bg-white rounded-lg p-6 shadow-lg border border-[#fff1cc]">
@@ -275,7 +249,7 @@ const ReviewForm = ({
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          onSubmit({ comment, advantages, disadvantages, rating });
+          onSubmit({ title, body, rating });
         }}
         className="space-y-6"
       >
@@ -312,14 +286,12 @@ const ReviewForm = ({
         </div>
 
         <div className="space-y-2">
-          <Typography className="text-[#473e39]">نظر شما:</Typography>
+          <Typography className="text-[#473e39]">عنوان نظر:</Typography>
           <TextField
             fullWidth
-            multiline
-            rows={4}
-            placeholder="تجربه خود را از خرید و استفاده از این محصول با دیگران به اشتراک بگذارید..."
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
+            placeholder="عنوان نظر خود را وارد کنید..."
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
             sx={{
               "& .MuiOutlinedInput-root": {
                 backgroundColor: "#fff",
@@ -337,116 +309,30 @@ const ReviewForm = ({
           />
         </div>
 
-        {/* مزایا */}
         <div className="space-y-2">
-          <Typography className="text-[#473e39]">مزایا:</Typography>
-          <div className="flex gap-2">
-            <TextField
-              fullWidth
-              placeholder="مزیت را وارد کنید..."
-              value={newAdvantage}
-              onChange={(e) => setNewAdvantage(e.target.value)}
-              sx={{
-                "& .MuiOutlinedInput-root": {
-                  backgroundColor: "#fff",
-                  "& fieldset": {
-                    borderColor: "#fff1cc",
-                  },
-                  "&:hover fieldset": {
-                    borderColor: "#7a4522",
-                  },
-                  "&.Mui-focused fieldset": {
-                    borderColor: "#7a4522",
-                  },
+          <Typography className="text-[#473e39]">نظر شما:</Typography>
+          <TextField
+            fullWidth
+            multiline
+            rows={4}
+            placeholder="تجربه خود را از خرید و استفاده از این محصول با دیگران به اشتراک بگذارید..."
+            value={body}
+            onChange={(e) => setBody(e.target.value)}
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                backgroundColor: "#fff",
+                "& fieldset": {
+                  borderColor: "#fff1cc",
                 },
-              }}
-            />
-            <Button
-              variant="contained"
-              onClick={handleAddAdvantage}
-              sx={{
-                bgcolor: "#432818",
-                "&:hover": {
-                  bgcolor: "#7a4522",
+                "&:hover fieldset": {
+                  borderColor: "#7a4522",
                 },
-              }}
-            >
-              افزودن
-            </Button>
-          </div>
-          <div className="flex flex-wrap gap-2 mt-2">
-            {advantages.map((advantage, index) => (
-              <div
-                key={index}
-                className="flex items-center gap-1 bg-green-50 text-green-700 px-3 py-1 rounded-full"
-              >
-                <span>{advantage}</span>
-                <button
-                  type="button"
-                  onClick={() => handleRemoveAdvantage(index)}
-                  className="text-green-700 hover:text-green-900"
-                >
-                  <FaTimes className="w-3 h-3" />
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* معایب */}
-        <div className="space-y-2">
-          <Typography className="text-[#473e39]">معایب:</Typography>
-          <div className="flex gap-2">
-            <TextField
-              fullWidth
-              placeholder="عیب را وارد کنید..."
-              value={newDisadvantage}
-              onChange={(e) => setNewDisadvantage(e.target.value)}
-              sx={{
-                "& .MuiOutlinedInput-root": {
-                  backgroundColor: "#fff",
-                  "& fieldset": {
-                    borderColor: "#fff1cc",
-                  },
-                  "&:hover fieldset": {
-                    borderColor: "#7a4522",
-                  },
-                  "&.Mui-focused fieldset": {
-                    borderColor: "#7a4522",
-                  },
+                "&.Mui-focused fieldset": {
+                  borderColor: "#7a4522",
                 },
-              }}
-            />
-            <Button
-              variant="contained"
-              onClick={handleAddDisadvantage}
-              sx={{
-                bgcolor: "#432818",
-                "&:hover": {
-                  bgcolor: "#7a4522",
-                },
-              }}
-            >
-              افزودن
-            </Button>
-          </div>
-          <div className="flex flex-wrap gap-2 mt-2">
-            {disadvantages.map((disadvantage, index) => (
-              <div
-                key={index}
-                className="flex items-center gap-1 bg-red-50 text-red-700 px-3 py-1 rounded-full"
-              >
-                <span>{disadvantage}</span>
-                <button
-                  type="button"
-                  onClick={() => handleRemoveDisadvantage(index)}
-                  className="text-red-700 hover:text-red-900"
-                >
-                  <FaTimes className="w-3 h-3" />
-                </button>
-              </div>
-            ))}
-          </div>
+              },
+            }}
+          />
         </div>
 
         <div className="flex gap-4">
@@ -810,8 +696,18 @@ export default function ProductsDetails() {
   };
 
   const handleSubmitReview = async (review: SubmitReviewRequest) => {
-    if (!review.comment.trim()) {
+    if (!review.body.trim()) {
       toast.error("لطفا نظر خود را وارد کنید");
+      return;
+    }
+
+    if (!review.title.trim()) {
+      toast.error("لطفا عنوان نظر را وارد کنید");
+      return;
+    }
+
+    if (review.rating === 0) {
+      toast.error("لطفا امتیاز خود را وارد کنید");
       return;
     }
 
