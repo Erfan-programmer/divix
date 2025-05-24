@@ -722,7 +722,11 @@ export default function ProductsDetails() {
             "Accept": "application/json",
             "x-api-key": "9anHzmriziuiUjNcwICqB7b1MDJa6xV3uQzOmZWy",
           },
-          body: JSON.stringify(review),
+          body: JSON.stringify({
+            title: review.title,
+            body: review.body,
+            rating: review.rating
+          }),
         }
       );
 
