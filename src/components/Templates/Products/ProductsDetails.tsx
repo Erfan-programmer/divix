@@ -284,7 +284,7 @@ const ReviewForm = ({
           <Typography className="mb-4 text-[#473e39]">
             امتیاز شما به این محصول:
           </Typography>
-          <div className="flex flex-col items-center gap-2">
+          <div className="flex flex-col items-start gap-2">
             <div className="flex flex-row-reverse">
               <Rating
                 value={rating}
