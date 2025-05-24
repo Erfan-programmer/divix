@@ -153,7 +153,7 @@ const MobileMenu = ({
               <>
                 <FaUser />
                 <span>
-                  {userData.first_name} {userData.last_name}
+                  {userData?.first_name} {userData?.last_name}
                 </span>
               </>
             ) : (

@@ -27,7 +27,7 @@ const CartSidebar = ({
       onClick={onClose}
     >
       <div
-        className={`fixed inset-y-0 left-0 w-[80%] sm:w-[400px] bg-white shadow-lg transition-transform duration-500 ${
+        className={`fixed inset-y-0 left-0 w-[85%] sm:w-[400px] bg-white shadow-lg transition-transform duration-500 ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
         onClick={(e) => e.stopPropagation()}
@@ -60,7 +60,7 @@ const CartSidebar = ({
                     <div className="flex-1">
                       <div className="flex justify-between items-start">
                         <h3 className="text-sm font-medium text-[#171717] mb-1">
-                          {item.title}
+                          {item.title.slice(0,30)}...
                         </h3>
                         <button
                           onClick={() => onRemoveItem(item.price.id)}
