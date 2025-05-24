@@ -1,6 +1,6 @@
-import { Fragment } from 'react';
-import toast, { Toaster } from 'react-hot-toast';
-import { FaExclamationTriangle } from 'react-icons/fa';
+import { Fragment } from "react";
+import toast, { Toaster } from "react-hot-toast";
+import { FaExclamationTriangle } from "react-icons/fa";
 
 interface LogoutModalProps {
   isOpen: boolean;
@@ -13,15 +13,15 @@ const LogoutModal = ({ isOpen, onClose }: LogoutModalProps) => {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        "Authorization" : `Beaer ${localStorage.getItem("token")}`,
-        "Accept": "application/json"
-      }
-    })
-    const data = await response.json()
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        Accept: "application/json",
+      },
+    });
+    const data = await response.json();
     if (data.status) {
-      toast.success("شما با موفقیت خارج شدید")
+      toast.success("شما با موفقیت خارج شدید");
     }
-    console.log('Logging out...');
+    console.log("Logging out...");
     onClose();
   };
 
@@ -29,7 +29,7 @@ const LogoutModal = ({ isOpen, onClose }: LogoutModalProps) => {
 
   return (
     <Fragment>
-            <Toaster
+      <Toaster
         position="top-right"
         toastOptions={{
           style: {
@@ -92,4 +92,4 @@ const LogoutModal = ({ isOpen, onClose }: LogoutModalProps) => {
   );
 };
 
-export default LogoutModal; 
+export default LogoutModal;
