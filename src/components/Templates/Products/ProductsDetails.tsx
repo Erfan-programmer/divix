@@ -1059,7 +1059,7 @@ export default function ProductsDetails() {
             {/* بخش تصاویر محصول */}
             <div className="space-y-2 md:space-y-4 mb-[5rem] md:mb-0">
               <div className="grid grid-cols-2 gap-2 md:gap-4">
-                {productData?.images.slice(0, 4).map((image, index) => (
+                {productData?.images?.slice(0, 4).map((image, index) => (
                   <div
                     key={image.id}
                     className={`relative h-[20vh] md:h-[30vh] md:h-[60vh] cursor-pointer`}
@@ -1398,7 +1398,7 @@ export default function ProductsDetails() {
           </div>
 
           {/* بخش محصولات مرتبط */}
-          {relatedProducts.length > 0 && (
+          {relatedProducts?.length > 0 && (
             <div className="mt-16">
               <h2 className="text-2xl font-bold text-[#432818] mb-8">محصولات مرتبط</h2>
 
