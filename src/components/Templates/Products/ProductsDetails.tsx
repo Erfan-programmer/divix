@@ -280,7 +280,7 @@ const ReviewForm = ({
         className="space-y-6"
       >
         {/* امتیازدهی */}
-        <div className="text-center">
+        <div className="text-right">
           <Typography className="mb-4 text-[#473e39]">
             امتیاز شما به این محصول:
           </Typography>
