@@ -6,8 +6,7 @@ import {
   FaComment,
   FaRegStar,
   FaTrash,
-  FaUser,
-  FaTimes,
+  FaUser
 } from "react-icons/fa";
 import { FaStar, FaChevronLeft } from "react-icons/fa";
 import { Link } from "react-router-dom";

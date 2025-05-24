@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import ProductTopBar from "../../Modules/Products/ProductTopBar";
 import ProductCard from "../../Modules/Home/ProductCard";
-import { FaFilter, FaSpinner } from "react-icons/fa";
+import { FaFilter} from "react-icons/fa";
 import Breadcrumb from "../../Modules/Breadcrumb";
 import { Checkbox, Slider } from "@mui/material";
 
@@ -81,7 +81,6 @@ interface Filter {
 const ProductsPage = () => {
   const navigate = useNavigate();
   const searchParams = useSearchParams()
-  const [selectedFilters, setSelectedFilters] = useState<Record<number, number[]>>({});
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [totalItems, setTotalItems] = useState(0);
   const [fromItem, setFromItem] = useState<number>(0);
@@ -97,7 +96,6 @@ const ProductsPage = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [openCategories, setOpenCategories] = useState<number[]>([]);
   const [filters, setFilters] = useState<Filter>({
     attributes: [],
@@ -109,19 +107,7 @@ const ProductsPage = () => {
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 0]);
   const [selectedBrands, setSelectedBrands] = useState<number[]>([]);
 
-  const handleFilterChange = (filterId: number, valueId: number) => {
-    setSelectedFilters(prev => {
-      const currentValues = prev[filterId] || [];
-      const newValues = currentValues.includes(valueId)
-        ? currentValues.filter(id => id !== valueId)
-        : [...currentValues, valueId];
-      
-      return {
-        ...prev,
-        [filterId]: newValues
-      };
-    });
-  };
+
 
   const handleSortChange = (value: string) => {
     const params = new URLSearchParams(searchParams[0]);
@@ -229,11 +215,8 @@ const ProductsPage = () => {
           setFromItem(data.result.meta.from);
           setToItem(data.result.meta.to);
           setSearchQuery(searchFromUrl || "");
-        } else {
-          setError("خطا در دریافت محصولات");
-        }
+        } 
       } catch (err) {
-        setError("خطا در ارتباط با سرور");
       } finally {
         setIsLoading(false);
       }
@@ -293,7 +276,7 @@ const ProductsPage = () => {
     }
   }, [selectedCategory]);
 
-  const handlePriceChange = (event: Event, newValue: number | number[]) => {
+  const handlePriceChange = (_: Event, newValue: number | number[]) => {
     setPriceRange(newValue as [number, number]);
   };
 
