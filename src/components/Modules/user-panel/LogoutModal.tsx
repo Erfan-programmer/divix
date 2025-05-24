@@ -13,6 +13,7 @@ const LogoutModal = ({ isOpen, onClose }: LogoutModalProps) => {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
+        "Authorization" : `Beaer ${localStorage.getItem("token")}`,
         "Accept": "application/json"
       }
     })
