@@ -1,6 +1,7 @@
 import { Fragment } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import { FaExclamationTriangle } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 interface LogoutModalProps {
   isOpen: boolean;
@@ -8,6 +9,7 @@ interface LogoutModalProps {
 }
 
 const LogoutModal = ({ isOpen, onClose }: LogoutModalProps) => {
+  const navigate = useNavigate()
   const handleLogout = async () => {
     const response = await fetch("https://admin.mydivix.com/api/v1/logout", {
       method: "GET",
@@ -20,6 +22,8 @@ const LogoutModal = ({ isOpen, onClose }: LogoutModalProps) => {
     const data = await response.json();
     if (data.status) {
       toast.success("شما با موفقیت خارج شدید");
+       navigate("/")
+       localStorage.removeItem("token")
     }
     console.log("Logging out...");
     onClose();
