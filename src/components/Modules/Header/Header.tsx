@@ -17,6 +17,14 @@ import MobileMenu from "./MobileMenu";
 import CartSidebar from "./CartSidebar";
 import toast from "react-hot-toast";
 import { useCart } from "../../../ContextApi/CartProvider";
+import { debounce } from "lodash";
+
+// اضافه کردن تایپ NodeJS
+declare global {
+  namespace NodeJS {
+    interface Timeout {}
+  }
+}
 
 export interface CartProduct {
   id: number;
@@ -194,38 +202,45 @@ const Header = () => {
     }
   }, [isSearchOpen]);
 
-  // تابع جستجو
-  const handleSearch = async (query: string) => {
-    setSearchQuery(query);
-    if (query.length > 2) {
-      setIsSearching(true);
-      try {
-        const response = await fetch(
-          `https://admin.mydivix.com/api/v1/products?search=${encodeURIComponent(query)}`
-        );
-        const data = await response.json();
-        
-        if (data.success) {
-          setSearchResults(data.result.map((item: any) => ({
-            id: item.id,
-            title: item.title,
-            type: 'محصول',
-            image: item.image || '/images/placeholder.jpg'
-          })));
-        } else {
+  // تابع جستجو با debounce از lodash
+  const debouncedSearch = useRef(
+    debounce(async (query: string) => {
+      if (query.length > 2) {
+        setIsSearching(true);
+        try {
+          const response = await fetch(
+            `https://admin.mydivix.com/api/v1/products?search=${encodeURIComponent(query)}`
+          );
+          const data = await response.json();
+          
+          if (data.success) {
+            setSearchResults(data.result.map((item: any) => ({
+              id: item.id,
+              title: item.title,
+              type: 'محصول',
+              image: item.image || '/images/placeholder.jpg'
+            })));
+          } else {
+            setSearchResults([]);
+            toast.error('خطا در دریافت نتایج جستجو');
+          }
+        } catch (error) {
+          console.error('خطا در جستجو:', error);
+          toast.error('خطا در جستجو');
           setSearchResults([]);
-          toast.error('خطا در دریافت نتایج جستجو');
+        } finally {
+          setIsSearching(false);
         }
-      } catch (error) {
-        console.error('خطا در جستجو:', error);
-        toast.error('خطا در جستجو');
+      } else {
         setSearchResults([]);
-      } finally {
-        setIsSearching(false);
       }
-    } else {
-      setSearchResults([]);
-    }
+    }, 500)
+  ).current;
+
+  // تابع handleSearch
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+    debouncedSearch(query);
   };
 
   console.log("totalIteme" , totalItems)

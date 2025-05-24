@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import moment from 'moment-jalaali';
+import { debounce } from "lodash";
 
 interface SearchResult {
   id: number;
@@ -19,10 +20,21 @@ const BlogSidebar: React.FC<BlogSidebarProps> = ({ onSearch }) => {
   const [isSearching] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleFormSubmit = (e: React.ChangeEvent<HTMLInputElement>) => {
-    e.preventDefault();
-    setSearchQuery(e.target.value);
-    onSearch(searchQuery);
+  // ایجاد تابع debounced برای جستجو
+  const debouncedSearch = useRef(
+    debounce((value: string) => {
+      if (value.length >= 3) {
+        onSearch(value);
+        setError(null);
+      } else {
+        setError('لطفا حداقل 3 حرف وارد کنید');
+      }
+    }, 500)
+  ).current;
+
+  const handleSearch = (value: string) => {
+    setSearchQuery(value);
+    debouncedSearch(value);
   };
 
   const formatDate = (date: string) => {
@@ -39,14 +51,7 @@ const BlogSidebar: React.FC<BlogSidebarProps> = ({ onSearch }) => {
         <input
           type="text"
           value={searchQuery}
-          onChange={(e) => {
-            handleFormSubmit(e);
-            if (e.target.value.length < 3) {
-              setError('لطفا حداقل 3 حرف وارد کنید');
-            } else {
-              setError(null);
-            }
-          }}
+          onChange={(e) => handleSearch(e.target.value)}
           placeholder="حداقل 3 حرف وارد کنید..."
           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#432818] focus:border-transparent"
         />

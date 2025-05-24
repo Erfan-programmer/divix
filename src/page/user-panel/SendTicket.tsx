@@ -3,7 +3,7 @@ import { FaPaperPlane, FaSpinner } from "react-icons/fa";
 import { toast } from "react-hot-toast";
 
 interface TicketForm {
-  title: string;
+  subject: string;
   message: string;
   priority: "low" | "medium" | "high";
 }
@@ -11,7 +11,7 @@ interface TicketForm {
 export const SendTicket = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState<TicketForm>({
-    title: "",
+    subject: "",
     message: "",
     priority: "medium",
   });
@@ -38,7 +38,7 @@ export const SendTicket = () => {
       if (data.success) {
         toast.success("تیکت شما با موفقیت ارسال شد");
         setFormData({
-          title: "",
+          subject: "",
           message: "",
           priority: "medium",
         });
@@ -63,8 +63,8 @@ export const SendTicket = () => {
               <label className="block text-[#7A4522]/80 mb-2">عنوان تیکت</label>
               <input
                 type="text"
-                value={formData.title}
-                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                value={formData.subject}
+                onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
                 className="w-full bg-white text-[#7A4522] px-4 py-2 rounded-lg border border-[#7A4522]/20 focus:border-[#7A4522] focus:ring-1 focus:ring-[#7A4522] focus:outline-none"
                 placeholder="عنوان تیکت خود را وارد کنید"
                 required

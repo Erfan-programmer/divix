@@ -6,23 +6,45 @@ import { useNavigate } from "react-router-dom";
 
 interface Ticket {
   id: number;
-  title: string;
-  message: string;
-  status: "open" | "closed" | "pending";
+  subject: string;
   priority: "low" | "medium" | "high";
+  user_id: number;
+  status: "open" | "closed" | "pending";
   created_at: string;
   updated_at: string;
+}
+
+interface TicketResponse {
+  current_page: number;
+  data: Ticket[];
+  first_page_url: string;
+  from: number;
+  last_page: number;
+  last_page_url: string;
+  links: {
+    url: string | null;
+    label: string;
+    active: boolean;
+  }[];
+  next_page_url: string | null;
+  path: string;
+  per_page: number;
+  prev_page_url: string | null;
+  to: number;
+  total: number;
 }
 
 export const TicketList = () => {
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const navigate = useNavigate();
 
-  const fetchTickets = async () => {
+  const fetchTickets = async (page: number = 1) => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch("https://admin.mydivix.com/api/v1/tickets", {
+      const response = await fetch(`https://admin.mydivix.com/api/v1/tickets?page=${page}`, {
         headers: {
           Authorization: `Bearer ${token}`,
           accept: "application/json",
@@ -30,15 +52,12 @@ export const TicketList = () => {
         },
       });
 
-      const data = await response.json();
-
-      if (data.success) {
-        setTickets(data.result.data);
-      } else {
-        throw new Error(data.message || "خطا در دریافت لیست تیکت‌ها");
-      }
+      const data: TicketResponse = await response.json();
+      setTickets(data.data);
+      setTotalPages(data.last_page);
+      setCurrentPage(data.current_page);
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "خطا در دریافت لیست تیکت‌ها");
+      toast.error("خطا در دریافت لیست تیکت‌ها");
     } finally {
       setIsLoading(false);
     }
@@ -114,40 +133,62 @@ export const TicketList = () => {
               <p className="text-[#7A4522]/70">شما هنوز هیچ تیکتی ارسال نکرده‌اید</p>
             </div>
           ) : (
-            <div className="space-y-4">
-              {tickets.map((ticket) => (
-                <div
-                  key={ticket.id}
-                  className="bg-white rounded-lg p-4 border border-[#7A4522]/10 hover:border-[#7A4522]/30 transition-all cursor-pointer"
-                  onClick={() => navigate(`/user-panel/tickets/${ticket.id}`)}
-                >
-                  <div className="flex justify-between items-start mb-2">
-                    <h3 className="text-lg font-medium text-[#7A4522]">{ticket.title}</h3>
-                    <div className="flex items-center gap-2">
-                      {getStatusIcon(ticket.status)}
-                      <span className="text-sm text-[#7A4522]/70">
-                        {getStatusText(ticket.status)}
+            <>
+              <div className="space-y-4">
+                {tickets.map((ticket) => (
+                  <div
+                    key={ticket.id}
+                    className="bg-white rounded-lg p-4 border border-[#7A4522]/10 hover:border-[#7A4522]/30 transition-all cursor-pointer"
+                    onClick={() => navigate(`/user-panel/tickets/${ticket.id}`)}
+                  >
+                    <div className="flex justify-between items-start mb-2">
+                      <h3 className="text-lg font-medium text-[#7A4522]">{ticket.subject}</h3>
+                      <div className="flex items-center gap-2">
+                        {getStatusIcon(ticket.status)}
+                        <span className="text-sm text-[#7A4522]/70">
+                          {getStatusText(ticket.status)}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex justify-between items-center text-sm">
+                      <span className={`${getPriorityColor(ticket.priority)}`}>
+                        {ticket.priority === "high"
+                          ? "اولویت بالا"
+                          : ticket.priority === "medium"
+                          ? "اولویت متوسط"
+                          : "اولویت پایین"}
+                      </span>
+                      <span className="text-[#7A4522]/50">
+                        {new Date(ticket.created_at).toLocaleDateString("fa-IR")}
                       </span>
                     </div>
                   </div>
-                  <p className="text-[#7A4522]/70 text-sm mb-3 line-clamp-2">
-                    {ticket.message}
-                  </p>
-                  <div className="flex justify-between items-center text-sm">
-                    <span className={`${getPriorityColor(ticket.priority)}`}>
-                      {ticket.priority === "high"
-                        ? "اولویت بالا"
-                        : ticket.priority === "medium"
-                        ? "اولویت متوسط"
-                        : "اولویت پایین"}
-                    </span>
-                    <span className="text-[#7A4522]/50">
-                      {new Date(ticket.created_at).toLocaleDateString("fa-IR")}
-                    </span>
-                  </div>
+                ))}
+              </div>
+
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className="flex justify-center gap-2 mt-6">
+                  <button
+                    onClick={() => fetchTickets(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className="px-3 py-1 rounded-lg border border-[#7A4522]/20 text-[#7A4522] disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#7A4522]/5 transition-colors"
+                  >
+                    قبلی
+                  </button>
+                  <span className="px-3 py-1 text-[#7A4522]">
+                    صفحه {currentPage} از {totalPages}
+                  </span>
+                  <button
+                    onClick={() => fetchTickets(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className="px-3 py-1 rounded-lg border border-[#7A4522]/20 text-[#7A4522] disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#7A4522]/5 transition-colors"
+                  >
+                    بعدی
+                  </button>
                 </div>
-              ))}
-            </div>
+              )}
+            </>
           )}
         </div>
       </div>

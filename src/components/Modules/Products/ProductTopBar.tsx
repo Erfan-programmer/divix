@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useRef, useState } from "react";
+import { debounce } from "lodash";
 
 interface ProductTopBarProps {
   totalProducts: number;
@@ -13,6 +14,24 @@ const ProductTopBar: React.FC<ProductTopBarProps> = ({
   onSearch,
   searchValue,
 }) => {
+  // ایجاد state محلی برای نمایش فوری تغییرات
+  const [localSearchValue, setLocalSearchValue] = useState(searchValue);
+
+  // ایجاد تابع debounced برای جستجو
+  const debouncedSearch = useRef(
+    debounce((value: string) => {
+      onSearch(value);
+    }, 500)
+  ).current;
+
+  // تابع handleSearch برای مدیریت تغییرات input
+  const handleSearch = (value: string) => {
+    // به‌روزرسانی فوری مقدار نمایشی
+    setLocalSearchValue(value);
+    // ارسال درخواست با تاخیر
+    debouncedSearch(value);
+  };
+
   return (
     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
       <div className="text-sm text-gray-500">
@@ -23,14 +42,14 @@ const ProductTopBar: React.FC<ProductTopBarProps> = ({
         <div className="relative w-full sm:w-64">
           <input
             type="text"
-            value={searchValue}
-            onChange={(e) => onSearch(e.target.value)}
+            value={localSearchValue}
+            onChange={(e) => handleSearch(e.target.value)}
             placeholder="جستجوی محصولات..."
             className="w-full px-4 py-2 pr-10 rounded-lg border-2 border-[#fff1cc] focus:border-[#7a4522] focus:outline-none transition-colors text-sm"
           />
-          {searchValue && (
+          {localSearchValue && (
             <button
-              onClick={() => onSearch("")}
+              onClick={() => handleSearch("")}
               className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#7a4522] transition-colors"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

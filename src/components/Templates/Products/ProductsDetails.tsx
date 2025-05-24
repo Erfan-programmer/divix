@@ -171,23 +171,27 @@ interface Review {
 }
 
 interface ReviewResponse {
-  current_page: number;
-  data: Review[];
-  first_page_url: string;
-  from: number;
-  last_page: number;
-  last_page_url: string;
-  links: {
-    url: string | null;
-    label: string;
-    active: boolean;
-  }[];
-  next_page_url: string | null;
-  path: string;
-  per_page: number;
-  prev_page_url: string | null;
-  to: number;
-  total: number;
+  success: boolean;
+  message: string;
+  result: {
+    current_page: number;
+    data: Review[];
+    first_page_url: string;
+    from: number;
+    last_page: number;
+    last_page_url: string;
+    links: {
+      url: string | null;
+      label: string;
+      active: boolean;
+    }[];
+    next_page_url: string | null;
+    path: string;
+    per_page: number;
+    prev_page_url: string | null;
+    to: number;
+    total: number;
+  };
 }
 
 const ReviewItem = ({ review }: { review: Review }) => (
@@ -223,11 +227,6 @@ const ReviewItem = ({ review }: { review: Review }) => (
         </div>
         <h5 className="font-bold text-[#171717] mb-2">{review.title}</h5>
         <p className="text-[#473e39] text-sm leading-6 mb-3">{review.body}</p>
-        {review.status === ReviewStatus.PENDING && (
-          <span className="inline-block px-2 py-1 text-xs bg-yellow-100 text-yellow-800 rounded-full">
-            در انتظار تایید
-          </span>
-        )}
       </div>
     </div>
   </div>
@@ -534,6 +533,8 @@ export default function ProductsDetails() {
   const [reviewsError, setReviewsError] = useState<string | null>(null);
   const [relatedProducts, setRelatedProducts] = useState<RelatedProduct[]>([]);
   const [isLoadingRelated, setIsLoadingRelated] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   const updateCartCountsFromCart = () => {
     if (!cartData) return;
@@ -873,7 +874,7 @@ export default function ProductsDetails() {
     }
   };
 
-  const fetchReviews = async () => {
+  const fetchReviews = async (page: number = 1) => {
     if (!productData) return;
 
     try {
@@ -881,7 +882,7 @@ export default function ProductsDetails() {
       setReviewsError(null);
 
       const response = await fetch(
-        `https://admin.mydivix.com/api/v1/products/${productData?.id}/reviews`,
+        `https://admin.mydivix.com/api/v1/products/${productData?.id}/reviews?page=${page}`,
         {
           headers: {
             'accept': 'application/json',
@@ -891,7 +892,15 @@ export default function ProductsDetails() {
       );
 
       const data: ReviewResponse = await response.json();
-      setReviews(data.data);
+      if (data.success) {
+        // فیلتر کردن نظرات pending
+        const approvedReviews = data.result.data.filter(review => review.status === ReviewStatus.APPROVED);
+        setReviews(approvedReviews);
+        setTotalPages(data.result.last_page);
+        setCurrentPage(data.result.current_page);
+      } else {
+        setReviewsError(data.message || 'خطا در دریافت نظرات');
+      }
     } catch (err) {
       setReviewsError('خطا در ارتباط با سرور');
     } finally {
@@ -1247,13 +1256,13 @@ export default function ProductsDetails() {
                               </div>
                             ) : reviewsError ? (
                               <div className="text-center text-red-500 py-4">{reviewsError}</div>
-                            ) : reviews.length === 0 ? (
+                            ) : reviews?.length === 0 ? (
                               <div className="text-center py-8">
                                 <FaComment className="w-12 h-12 text-gray-300 mx-auto mb-3" />
                                 <p className="text-gray-500">هنوز نظری برای این محصول ثبت نشده است</p>
                               </div>
                             ) : (
-                              reviews.map((review) => <ReviewItem key={review.id} review={review} />)
+                              reviews?.map((review) => <ReviewItem key={review.id} review={review} />)
                             )}
 
                             {showReviewForm && (
@@ -1348,6 +1357,29 @@ export default function ProductsDetails() {
                   محصول مرتبطی یافت نشد
                 </div>
               )}
+            </div>
+          )}
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex justify-center gap-2 mt-6">
+              <button
+                onClick={() => fetchReviews(currentPage - 1)}
+                disabled={currentPage === 1}
+                className="px-3 py-1 rounded-lg border border-[#fff1cc] text-[#473e39] disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#fff1cc] transition-colors"
+              >
+                قبلی
+              </button>
+              <span className="px-3 py-1 text-[#473e39]">
+                صفحه {currentPage} از {totalPages}
+              </span>
+              <button
+                onClick={() => fetchReviews(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className="px-3 py-1 rounded-lg border border-[#fff1cc] text-[#473e39] disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#fff1cc] transition-colors"
+              >
+                بعدی
+              </button>
             </div>
           )}
         </>
