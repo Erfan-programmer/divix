@@ -6,7 +6,8 @@ import {
   FaComment,
   FaRegStar,
   FaTrash,
-  FaUser
+  FaUser,
+  FaTimes
 } from "react-icons/fa";
 import { FaStar, FaChevronLeft } from "react-icons/fa";
 import { Link } from "react-router-dom";
@@ -227,6 +228,8 @@ const ReviewItem = ({ review }: { review: Review }) => (
 
 interface SubmitReviewRequest {
   comment: string;
+  advantages: string[];
+  disadvantages: string[];
 }
 
 const ReviewForm = ({
@@ -237,6 +240,32 @@ const ReviewForm = ({
   onCancel: () => void;
 }) => {
   const [comment, setComment] = useState("");
+  const [advantages, setAdvantages] = useState<string[]>([]);
+  const [disadvantages, setDisadvantages] = useState<string[]>([]);
+  const [newAdvantage, setNewAdvantage] = useState("");
+  const [newDisadvantage, setNewDisadvantage] = useState("");
+
+  const handleAddAdvantage = () => {
+    if (newAdvantage.trim()) {
+      setAdvantages([...advantages, newAdvantage.trim()]);
+      setNewAdvantage("");
+    }
+  };
+
+  const handleRemoveAdvantage = (index: number) => {
+    setAdvantages(advantages.filter((_, i) => i !== index));
+  };
+
+  const handleAddDisadvantage = () => {
+    if (newDisadvantage.trim()) {
+      setDisadvantages([...disadvantages, newDisadvantage.trim()]);
+      setNewDisadvantage("");
+    }
+  };
+
+  const handleRemoveDisadvantage = (index: number) => {
+    setDisadvantages(disadvantages.filter((_, i) => i !== index));
+  };
 
   return (
     <div className="bg-white rounded-lg p-6 shadow-lg border border-[#fff1cc]">
@@ -244,7 +273,7 @@ const ReviewForm = ({
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          onSubmit({ comment });
+          onSubmit({ comment, advantages, disadvantages });
         }}
         className="space-y-6"
       >
@@ -272,6 +301,118 @@ const ReviewForm = ({
               },
             }}
           />
+        </div>
+
+        {/* مزایا */}
+        <div className="space-y-2">
+          <Typography className="text-[#473e39]">مزایا:</Typography>
+          <div className="flex gap-2">
+            <TextField
+              fullWidth
+              placeholder="مزیت را وارد کنید..."
+              value={newAdvantage}
+              onChange={(e) => setNewAdvantage(e.target.value)}
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  backgroundColor: "#fff",
+                  "& fieldset": {
+                    borderColor: "#fff1cc",
+                  },
+                  "&:hover fieldset": {
+                    borderColor: "#7a4522",
+                  },
+                  "&.Mui-focused fieldset": {
+                    borderColor: "#7a4522",
+                  },
+                },
+              }}
+            />
+            <Button
+              variant="contained"
+              onClick={handleAddAdvantage}
+              sx={{
+                bgcolor: "#432818",
+                "&:hover": {
+                  bgcolor: "#7a4522",
+                },
+              }}
+            >
+              افزودن
+            </Button>
+          </div>
+          <div className="flex flex-wrap gap-2 mt-2">
+            {advantages.map((advantage, index) => (
+              <div
+                key={index}
+                className="flex items-center gap-1 bg-green-50 text-green-700 px-3 py-1 rounded-full"
+              >
+                <span>{advantage}</span>
+                <button
+                  type="button"
+                  onClick={() => handleRemoveAdvantage(index)}
+                  className="text-green-700 hover:text-green-900"
+                >
+                  <FaTimes className="w-3 h-3" />
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* معایب */}
+        <div className="space-y-2">
+          <Typography className="text-[#473e39]">معایب:</Typography>
+          <div className="flex gap-2">
+            <TextField
+              fullWidth
+              placeholder="عیب را وارد کنید..."
+              value={newDisadvantage}
+              onChange={(e) => setNewDisadvantage(e.target.value)}
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  backgroundColor: "#fff",
+                  "& fieldset": {
+                    borderColor: "#fff1cc",
+                  },
+                  "&:hover fieldset": {
+                    borderColor: "#7a4522",
+                  },
+                  "&.Mui-focused fieldset": {
+                    borderColor: "#7a4522",
+                  },
+                },
+              }}
+            />
+            <Button
+              variant="contained"
+              onClick={handleAddDisadvantage}
+              sx={{
+                bgcolor: "#432818",
+                "&:hover": {
+                  bgcolor: "#7a4522",
+                },
+              }}
+            >
+              افزودن
+            </Button>
+          </div>
+          <div className="flex flex-wrap gap-2 mt-2">
+            {disadvantages.map((disadvantage, index) => (
+              <div
+                key={index}
+                className="flex items-center gap-1 bg-red-50 text-red-700 px-3 py-1 rounded-full"
+              >
+                <span>{disadvantage}</span>
+                <button
+                  type="button"
+                  onClick={() => handleRemoveDisadvantage(index)}
+                  className="text-red-700 hover:text-red-900"
+                >
+                  <FaTimes className="w-3 h-3" />
+                </button>
+              </div>
+            ))}
+          </div>
         </div>
 
         <div className="flex gap-4">
