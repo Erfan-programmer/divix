@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   FaShoppingCart,
   FaUser,
@@ -229,7 +229,7 @@ const Header = () => {
   };
 
   console.log("totalIteme" , totalItems)
-
+  const navigate = useNavigate()
   return (
     <header className={`bg-[#fff1cc] text-[#7a4522] shadow-lg relative z-50 `}>
       {/* بخش بالایی هدر */}
@@ -250,6 +250,7 @@ const Header = () => {
                 className={`flex items-center space-x-2 transition-all duration-500`}
               >
                 <img
+                 onClick={()=> navigate("/")}
                   src="/images/divix-logo-final.png"
                   alt="Next.js Logo"
                   width={100}
