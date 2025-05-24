@@ -822,7 +822,7 @@ export default function ProductsDetails() {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "Authorization" : `Bearer ${localStorage.getItem("token")}`,
+            "Authorization": `Bearer ${localStorage.getItem("token")}`,
             "Accept": "application/json",
             "x-api-key": "9anHzmriziuiUjNcwICqB7b1MDJa6xV3uQzOmZWy",
           },
@@ -1398,54 +1398,56 @@ export default function ProductsDetails() {
           </div>
 
           {/* بخش محصولات مرتبط */}
-          <div className="mt-16">
-            <h2 className="text-2xl font-bold text-[#432818] mb-8">محصولات مرتبط</h2>
+          {relatedProducts.length > 0 && (
+            <div className="mt-16">
+              <h2 className="text-2xl font-bold text-[#432818] mb-8">محصولات مرتبط</h2>
 
-            {isLoadingRelated ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                {[1, 2, 3, 4].map((item) => (
-                  <div key={item} className="bg-white rounded-xl p-4 animate-pulse">
-                    <div className="h-48 bg-gray-200 rounded-lg mb-4"></div>
-                    <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-                    <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-                  </div>
-                ))}
-              </div>
-            ) : relatedProducts?.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                {relatedProducts?.map((product) => (
-                  <Link
-                    key={product?.id}
-                    to={`/products/${product?.id}`}
-                    className="bg-white rounded-xl p-4 hover:shadow-lg transition-shadow"
-                  >
-                    <div className="aspect-square relative rounded-lg overflow-hidden mb-4">
-                      <img
-                        src={product?.image || "/images/placeholder.jpg"}
-                        alt={product?.title}
-                        className="object-cover"
-                      />
+              {isLoadingRelated ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                  {[1, 2, 3, 4].map((item) => (
+                    <div key={item} className="bg-white rounded-xl p-4 animate-pulse">
+                      <div className="h-48 bg-gray-200 rounded-lg mb-4"></div>
+                      <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                      <div className="h-4 bg-gray-200 rounded w-1/2"></div>
                     </div>
-                    <h3 className="font-bold text-[#432818] mb-2 line-clamp-2">
-                      {product?.title}
-                    </h3>
-                    <div className="flex items-center justify-between">
-                      <span className="text-[#7a4522] font-bold">
-                        {product?.price.toLocaleString()} تومان
-                      </span>
-                      <span className="text-sm text-gray-500">
-                        {product?.category.title}
-                      </span>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-8 text-gray-500">
-                محصول مرتبطی یافت نشد
-              </div>
-            )}
-          </div>
+                  ))}
+                </div>
+              ) : relatedProducts?.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                  {relatedProducts?.map((product) => (
+                    <Link
+                      key={product?.id}
+                      to={`/products/${product?.id}`}
+                      className="bg-white rounded-xl p-4 hover:shadow-lg transition-shadow"
+                    >
+                      <div className="aspect-square relative rounded-lg overflow-hidden mb-4">
+                        <img
+                          src={product?.image || "/images/placeholder.jpg"}
+                          alt={product?.title}
+                          className="object-cover"
+                        />
+                      </div>
+                      <h3 className="font-bold text-[#432818] mb-2 line-clamp-2">
+                        {product?.title}
+                      </h3>
+                      <div className="flex items-center justify-between">
+                        <span className="text-[#7a4522] font-bold">
+                          {product?.price.toLocaleString()} تومان
+                        </span>
+                        <span className="text-sm text-gray-500">
+                          {product?.category.title}
+                        </span>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8 text-gray-500">
+                  محصول مرتبطی یافت نشد
+                </div>
+              )}
+            </div>
+          )}
         </>
       )}
     </div>
