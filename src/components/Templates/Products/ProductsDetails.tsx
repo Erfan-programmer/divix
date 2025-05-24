@@ -230,6 +230,7 @@ interface SubmitReviewRequest {
   comment: string;
   advantages: string[];
   disadvantages: string[];
+  rating: number;
 }
 
 const ReviewForm = ({
@@ -244,6 +245,7 @@ const ReviewForm = ({
   const [disadvantages, setDisadvantages] = useState<string[]>([]);
   const [newAdvantage, setNewAdvantage] = useState("");
   const [newDisadvantage, setNewDisadvantage] = useState("");
+  const [rating, setRating] = useState(0);
 
   const handleAddAdvantage = () => {
     if (newAdvantage.trim()) {
@@ -273,10 +275,42 @@ const ReviewForm = ({
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          onSubmit({ comment, advantages, disadvantages });
+          onSubmit({ comment, advantages, disadvantages, rating });
         }}
         className="space-y-6"
       >
+        {/* امتیازدهی */}
+        <div className="text-center">
+          <Typography className="mb-4 text-[#473e39]">
+            امتیاز شما به این محصول:
+          </Typography>
+          <div className="flex flex-col items-center gap-2">
+            <div className="flex flex-row-reverse">
+              <Rating
+                value={rating}
+                precision={1}
+                onChange={(_, newValue) => {
+                  setRating(newValue || 0);
+                }}
+                icon={<FaStar size={24} color="#7a4522" />}
+                emptyIcon={<FaRegStar size={24} color="#7a4522" />}
+                sx={{
+                  fontSize: "2.5rem",
+                  direction: "ltr",
+                  "& .MuiRating-iconFilled": {
+                    color: "#7a4522",
+                    borderRadius: "4px",
+                  },
+                  "& .MuiRating-iconEmpty": {
+                    color: "#fff1cc",
+                    borderRadius: "4px",
+                  },
+                }}
+              />
+            </div>
+          </div>
+        </div>
+
         <div className="space-y-2">
           <Typography className="text-[#473e39]">نظر شما:</Typography>
           <TextField
