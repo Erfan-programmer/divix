@@ -1057,7 +1057,7 @@ export default function ProductsDetails() {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-8">
             {/* بخش تصاویر محصول */}
-            <div className="space-y-2 md:space-y-4">
+            <div className="space-y-2 md:space-y-4 mb-[5rem] md:mb-0">
               <div className="grid grid-cols-2 gap-2 md:gap-4">
                 {productData?.images.slice(0, 4).map((image, index) => (
                   <div
