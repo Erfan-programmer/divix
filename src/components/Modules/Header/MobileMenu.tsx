@@ -33,9 +33,15 @@ interface Menu {
   children: any | null;
   childrenmenus: any[];
 }
+interface userData  {
+  first_name: string;
+  last_name: string;
+  profile_photo_url: string;
+}
 
 interface MobileMenuProps {
   isOpen: boolean;
+  userData: userData | null;
   onClose: () => void;
   categories?: Category[];
   menus?: Menu[];
@@ -61,44 +67,39 @@ const Accordion = ({
   return (
     <div className="space-y-2">
       <div
-        className={`flex items-center justify-between p-2 rounded-lg transition-colors duration-300 ${
-          isActive ? "bg-[#7a4522] text-[#FFF1CC]" : "bg-white text-[#473e39]"
-        }`}
+        className={`flex items-center justify-between p-2 rounded-lg transition-colors duration-300 ${isActive ? "bg-[#7a4522] text-[#FFF1CC]" : "bg-white text-[#473e39]"
+          }`}
       >
         {href ? (
           <Link
             to={href}
-            className={`flex-1 ${
-              isActive
+            className={`flex-1 ${isActive
                 ? "text-[#FFF1CC]"
                 : isActiveRoute
-                ? "text-[#7a4522]"
-                : "text-[#473e39]"
-            }`}
+                  ? "text-[#7a4522]"
+                  : "text-[#473e39]"
+              }`}
           >
             {title}
           </Link>
         ) : (
           <span
-            className={`flex-1 ${
-              isActive ? "text-[#FFF1CC]" : "text-[#473e39]"
-            }`}
+            className={`flex-1 ${isActive ? "text-[#FFF1CC]" : "text-[#473e39]"
+              }`}
           >
             {title}
           </span>
         )}
         <button onClick={onToggle} className="p-2">
           <FaAngleLeft
-            className={`transition-transform duration-300 ${
-              isActive ? "rotate-90 text-[#FFF1CC]" : "rotate-0"
-            }`}
+            className={`transition-transform duration-300 ${isActive ? "rotate-90 text-[#FFF1CC]" : "rotate-0"
+              }`}
           />
         </button>
       </div>
       <div
-        className={`overflow-hidden transition-all duration-300 ${
-          isActive ? "max-h-[1000px] opacity-100" : "max-h-0 opacity-0"
-        }`}
+        className={`overflow-hidden transition-all duration-300 ${isActive ? "max-h-[1000px] opacity-100" : "max-h-0 opacity-0"
+          }`}
       >
         <div className="pr-4 space-y-2">{children}</div>
       </div>
@@ -109,6 +110,7 @@ const Accordion = ({
 const MobileMenu = ({
   isOpen,
   onClose,
+  userData,
   categories = [],
   menus = [],
 }: MobileMenuProps) => {
@@ -126,15 +128,13 @@ const MobileMenu = ({
 
   return (
     <div
-      className={`fixed inset-0 bg-black/50 backdrop-blur-sm z-50 transition-all duration-300 ${
-        isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
-      }`}
+      className={`fixed inset-0 bg-black/50 backdrop-blur-sm z-50 transition-all duration-300 ${isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+        }`}
       onClick={onClose}
     >
       <div
-        className={`fixed inset-y-0 right-0 w-[85%] max-w-md bg-[#FFF1CC] shadow-xl transform transition-transform duration-300 ${
-          isOpen ? "translate-x-0" : "translate-x-full"
-        }`}
+        className={`fixed inset-y-0 right-0 w-[85%] max-w-md bg-[#FFF1CC] shadow-xl transform transition-transform duration-300 ${isOpen ? "translate-x-0" : "translate-x-full"
+          }`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* هدر منو */}
@@ -149,8 +149,19 @@ const MobileMenu = ({
             to="/login"
             className="flex items-center gap-2 bg-amber-500 hover:bg-amber-600 transition-colors px-4 py-2 rounded-full"
           >
-            <FaUser />
-            <span>ورود / ثبت نام</span>
+            {userData?.first_name?.length ? (
+              <>
+                <FaUser />
+                <span>
+                  {userData.first_name} {userData.last_name}
+                </span>
+              </>
+            ) : (
+              <>
+                <FaUser />
+                <span>ورود / ثبت نام</span>
+              </>
+            )}
           </Link>
         </div>
 
@@ -184,7 +195,7 @@ const MobileMenu = ({
                               : category.id
                           )
                         }
-                      href={`/products?category_id=${category.id}`}
+                        href={`/products?category_id=${category.id}`}
                       >
                         {category.categories.map((subCategory) => (
                           <Link
@@ -222,11 +233,10 @@ const MobileMenu = ({
                   <Link
                     key={menu.id}
                     to="/blogs"
-                    className={`block p-2 bg-white rounded-lg ${
-                      isActiveRoute("/blog")
+                    className={`block p-2 bg-white rounded-lg ${isActiveRoute("/blog")
                         ? "text-[#7a4522]"
                         : "text-[#473e39]"
-                    }`}
+                      }`}
                   >
                     {menu.title}
                   </Link>
@@ -279,11 +289,10 @@ const MobileMenu = ({
                 <Link
                   key={menu.id}
                   to={menu.link || "#"}
-                  className={`block p-2 bg-white rounded-lg ${
-                    isActiveRoute(menu.link || "")
+                  className={`block p-2 bg-white rounded-lg ${isActiveRoute(menu.link || "")
                       ? "text-[#7a4522]"
                       : "text-[#473e39]"
-                  }`}
+                    }`}
                 >
                   {menu.title}
                 </Link>

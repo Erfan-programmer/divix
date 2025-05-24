@@ -628,6 +628,7 @@ const Header = () => {
       {/* منوی موبایل */}
       <MobileMenu
         isOpen={isMobileMenuOpen}
+        userData={userData}
         onClose={() => setIsMobileMenuOpen(false)}
         categories={categories}
         menus={menus}
