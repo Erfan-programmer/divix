@@ -9,17 +9,8 @@ import { Link, useParams } from "react-router-dom";
 import { IoDocumentText } from "react-icons/io5";
 import { useEffect, useState } from "react";
 import moment from "moment-jalaali";
-import { toast, Toaster } from "react-hot-toast";
+import { Toaster } from "react-hot-toast";
 
-interface Comment {
-  id: number;
-  body: string;
-  user: {
-    id: number;
-    name: string;
-  };
-  created_at: string;
-}
 
 interface RelatedPost {
   id: number;
@@ -52,33 +43,10 @@ interface ApiResponse {
   message?: string;
 }
 
-interface CommentsResponse {
-  success: boolean;
-  result: {
-    data: Comment[];
-    meta: {
-      current_page: number;
-      last_page: number;
-      per_page: number;
-      total: number;
-    };
-  };
-}
-
 export default function BlogDetail() {
   const [post, setPost] = useState<Post | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [comments, setComments] = useState<Comment[]>([]);
-  const [commentPage, setCommentPage] = useState(1);
-  const [totalComments, setTotalComments] = useState(0);
-  const [lastCommentPage, setLastCommentPage] = useState(1);
-  const [isLoadingComments, setIsLoadingComments] = useState(false);
-  const [commentForm, setCommentForm] = useState({
-    name: "",
-    email: "",
-    body: "",
-  });
   const [shareUrl, setShareUrl] = useState("");
   const { id } = useParams()
   useEffect(() => {
@@ -115,36 +83,6 @@ export default function BlogDetail() {
   }, [id]);
 
   useEffect(() => {
-    const fetchComments = async () => {
-      if (!post) return;
-
-      try {
-        setIsLoadingComments(true);
-        const response = await fetch(
-          `https://admin.mydivix.com/api/v1/posts/${post.id}/comments?page=${commentPage}&per_page=5`
-        );
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const data: CommentsResponse = await response.json();
-        if (data.success) {
-          setComments(data.result.data);
-          setTotalComments(data.result.meta.total);
-          setLastCommentPage(data.result.meta.last_page);
-        }
-      } catch (err) {
-        console.error("Error fetching comments:", err);
-      } finally {
-        setIsLoadingComments(false);
-      }
-    };
-
-    fetchComments();
-  }, [post, commentPage]);
-
-  useEffect(() => {
     if (post) {
       const url = `https://mydivix.com/blogs/${post.slug}`;
       setShareUrl(url);
@@ -167,41 +105,6 @@ export default function BlogDetail() {
     return moment(date).format("jYYYY/jMM/jDD");
   };
 
-  const handleCommentSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!commentForm.name.trim() || !commentForm.email.trim() || !commentForm.body.trim()) {
-      toast.error("لطفا تمام فیلدها را پر کنید");
-      return;
-    }
-
-    try {
-      const response = await fetch(
-        `https://admin.mydivix.com/api/v1/posts/${post?.id}/comments`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Accept": "application/json",
-          },
-          body: JSON.stringify(commentForm),
-        }
-      );
-
-      const data = await response.json();
-
-      if (data.success) {
-        toast.success("نظر شما با موفقیت ثبت شد");
-        setCommentForm({ name: "", email: "", body: "" });
-        // دریافت مجدد نظرات
-        setCommentPage(1);
-      } else {
-        toast.error(data.message || "خطا در ثبت نظر");
-      }
-    } catch (error) {
-      toast.error("خطا در ارتباط با سرور");
-    }
-  };
 
   if (loading) {
     return (
@@ -312,114 +215,7 @@ export default function BlogDetail() {
                     dangerouslySetInnerHTML={{ __html: post.content }}
                   />
 
-                  {/* بخش نظرات */}
-                  <div className="mt-12">
-                    <h3 className="text-lg md:text-2xl font-bold text-[#432818] mb-6">
-                      نظرات ({totalComments})
-                    </h3>
-                    <div className="space-y-6">
-                      {/* فرم ارسال نظر */}
-                      <div className="bg-gray-50 p-6 rounded-lg">
-                        <h4 className="text-lg font-bold text-[#432818] mb-4">
-                          ارسال نظر
-                        </h4>
-                        <form onSubmit={handleCommentSubmit} className="space-y-4">
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <input
-                              type="text"
-                              placeholder="نام"
-                              value={commentForm.name}
-                              onChange={(e) => setCommentForm(prev => ({ ...prev, name: e.target.value }))}
-                              className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6F1D1B]"
-                            />
-                            <input
-                              type="email"
-                              placeholder="ایمیل"
-                              value={commentForm.email}
-                              onChange={(e) => setCommentForm(prev => ({ ...prev, email: e.target.value }))}
-                              className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6F1D1B]"
-                            />
-                          </div>
-                          <textarea
-                            placeholder="نظر شما"
-                            rows={4}
-                            value={commentForm.body}
-                            onChange={(e) => setCommentForm(prev => ({ ...prev, body: e.target.value }))}
-                            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6F1D1B]"
-                          ></textarea>
-                          <button
-                            type="submit"
-                            className="bg-[#6F1D1B] text-white px-6 py-2 rounded-lg hover:bg-[#432818] transition-colors"
-                          >
-                            ارسال نظر
-                          </button>
-                        </form>
-                      </div>
-
-                      {/* لیست نظرات */}
-                      <div className="space-y-4">
-                        {isLoadingComments ? (
-                          <div className="space-y-4">
-                            {[1, 2, 3].map((item) => (
-                              <div key={item} className="bg-gray-50 p-4 rounded-lg animate-pulse">
-                                <div className="flex items-center justify-between mb-2">
-                                  <div className="h-4 w-24 bg-gray-200 rounded"></div>
-                                  <div className="h-4 w-20 bg-gray-200 rounded"></div>
-                                </div>
-                                <div className="h-4 w-full bg-gray-200 rounded"></div>
-                              </div>
-                            ))}
-                          </div>
-                        ) : comments.length > 0 ? (
-                          <>
-                            {comments.map((comment) => (
-                              <div
-                                key={comment.id}
-                                className="bg-gray-50 p-4 rounded-lg"
-                              >
-                                <div className="flex items-center justify-between mb-2">
-                                  <span className="font-bold text-[#432818]">
-                                    {comment.user.name}
-                                  </span>
-                                  <span className="text-sm text-gray-500">
-                                    {formatDate(comment.created_at)}
-                                  </span>
-                                </div>
-                                <p className="text-gray-600">{comment.body}</p>
-                              </div>
-                            ))}
-
-                            {/* صفحه‌بندی */}
-                            {lastCommentPage > 1 && (
-                              <div className="flex justify-center gap-2 mt-6">
-                                <button
-                                  onClick={() => setCommentPage(prev => Math.max(prev - 1, 1))}
-                                  disabled={commentPage === 1}
-                                  className="px-4 py-2 border border-[#6F1D1B] rounded-lg text-[#6F1D1B] disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#6F1D1B] hover:text-white transition-colors"
-                                >
-                                  قبلی
-                                </button>
-                                <span className="px-4 py-2 text-[#432818]">
-                                  صفحه {commentPage} از {lastCommentPage}
-                                </span>
-                                <button
-                                  onClick={() => setCommentPage(prev => Math.min(prev + 1, lastCommentPage))}
-                                  disabled={commentPage === lastCommentPage}
-                                  className="px-4 py-2 border border-[#6F1D1B] rounded-lg text-[#6F1D1B] disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#6F1D1B] hover:text-white transition-colors"
-                                >
-                                  بعدی
-                                </button>
-                              </div>
-                            )}
-                          </>
-                        ) : (
-                          <div className="text-center py-8 text-gray-500">
-                            هنوز نظری ثبت نشده است
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
+      
                 </div>
               </article>
             </div>
