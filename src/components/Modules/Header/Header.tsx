@@ -69,6 +69,7 @@ export interface CartResponse {
 
 interface SearchResult {
   id: number;
+  slug: string;
   title: string;
   type: string;
   image: string;
@@ -209,13 +210,15 @@ const Header = () => {
         setIsSearching(true);
         try {
           const response = await fetch(
-            `https://admin.mydivix.com/api/v1/products?search=${encodeURIComponent(query)}`
+            `https://admin.mydivix.com/api/v1/search/products?q=${encodeURIComponent(query)}`
           );
           const data = await response.json();
           
+          console.log("data  =>" ,  data);
           if (data.success) {
-            setSearchResults(data.result.map((item: any) => ({
+            setSearchResults(data.result.data.map((item: any) => ({
               id: item.id,
+              slug: item.slug,
               title: item.title,
               type: 'محصول',
               image: item.image || '/images/placeholder.jpg'
@@ -225,7 +228,7 @@ const Header = () => {
             toast.error('خطا در دریافت نتایج جستجو');
           }
         } catch (error) {
-          console.error('خطا در جستجو:', error);
+          console.error('خطا در جستجdxxdswdxو:', error);
           toast.error('خطا در جستجو');
           setSearchResults([]);
         } finally {
@@ -243,7 +246,6 @@ const Header = () => {
     debouncedSearch(query);
   };
 
-  console.log("totalIteme" , totalItems)
   const navigate = useNavigate()
   return (
     <header className={`bg-[#fff1cc] text-[#7a4522] shadow-lg relative z-50 `}>
@@ -360,7 +362,7 @@ const Header = () => {
                                         (subCategory) => (
                                           <Link
                                             key={subCategory.id}
-                                            to={`/products?category_id=${subCategory.id}`}
+                                            to={`/products?category_id=${subCategory.slug}`}
                                             className="flex items-center gap-3 p-2 hover:bg-[#ffffff] rounded-lg transition-colors group"
                                           >
                                             <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
@@ -556,7 +558,7 @@ const Header = () => {
                               {searchResults.map((result) => (
                                 <Link
                                   key={result.id}
-                                  to={`/products/${result.id}`}
+                                  to={`/products/${result?.slug}`}
                                   className="flex items-center gap-2 sm:gap-3 p-2 hover:bg-gray-100 rounded-lg cursor-pointer"
                                   onClick={() => {
                                     setIsSearchOpen(false);
