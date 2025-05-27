@@ -83,17 +83,24 @@ export default function ChechoutCart() {
 
   useEffect(() => {
     isMounted.current = true;
+    const abortController = new AbortController();
     const loadCart = async () => {
       try {
         setIsLoading(true);
         await fetchCart();
       } catch (err) {
+        if (err instanceof Error && err.name === 'AbortError') {
+          return;
+        }
         setError("خطا در دریافت اطلاعات سبد خرید");
       } finally {
         setIsLoading(false);
       }
     };
     loadCart();
+    return () => {
+      abortController.abort();
+    };
   }, []);
 
   useEffect(() => {
@@ -129,7 +136,8 @@ export default function ChechoutCart() {
 
   const handleQuantityChange = async (
     productId: number,
-    newQuantity: number
+    newQuantity: number,
+    signal?: AbortSignal
   ) => {
     try {
       setUpdatingItems((prev) => ({ ...prev, [productId]: true }));
@@ -150,6 +158,7 @@ export default function ChechoutCart() {
           price_id: productId,
           quantity: 1,
         }),
+        signal
       });
 
       if (response.status === 422) {
@@ -174,6 +183,9 @@ export default function ChechoutCart() {
         toast.error("تعداد این محصول در انبار به پایان رسیده است");
       }
     } catch (error) {
+      if (error instanceof Error && error.name === 'AbortError') {
+        return;
+      }
       console.error("خطا در ارتباط با سرور:", error);
       toast.error("خطا در بروزرسانی تعداد");
     } finally {
@@ -181,7 +193,7 @@ export default function ChechoutCart() {
     }
   };
 
-  const handleApplyDiscount = async () => {
+  const handleApplyDiscount = async (signal?: AbortSignal) => {
     if (!discountCode.trim()) {
       toast.error("لطفا کد تخفیف را وارد کنید");
       return;
@@ -200,6 +212,7 @@ export default function ChechoutCart() {
           body: JSON.stringify({
             code: discountCode.trim(),
           }),
+          signal
         }
       );
 
@@ -212,13 +225,16 @@ export default function ChechoutCart() {
         toast.error(data.message || "کد تخفیف نامعتبر است");
       }
     } catch (error) {
+      if (error instanceof Error && error.name === 'AbortError') {
+        return;
+      }
       toast.error("خطا در اعمال کد تخفیف");
     } finally {
       setIsApplyingDiscount(false);
     }
   };
 
-  const handleRemoveDiscount = async () => {
+  const handleRemoveDiscount = async (signal?: AbortSignal) => {
     try {
       const response = await fetch(
         "https://admin.mydivix.com/api/v1/cart/discount",
@@ -228,6 +244,7 @@ export default function ChechoutCart() {
             "Content-Type": "application/json",
             "cart-id": `${localStorage.getItem("cart-id")}`,
           },
+          signal
         }
       );
 
@@ -239,6 +256,9 @@ export default function ChechoutCart() {
         await fetchCart();
       }
     } catch (error) {
+      if (error instanceof Error && error.name === 'AbortError') {
+        return;
+      }
       toast.error("خطا در حذف کد تخفیف");
     }
   };
@@ -475,14 +495,14 @@ export default function ChechoutCart() {
                   />
                   {discountAmount > 0 ? (
                     <button
-                      onClick={handleRemoveDiscount}
+                      onClick={() => handleRemoveDiscount()}
                       className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
                     >
                       حذف
                     </button>
                   ) : (
                     <button
-                      onClick={handleApplyDiscount}
+                      onClick={() => handleApplyDiscount()}
                       disabled={isApplyingDiscount}
                       className={`px-4 py-2 rounded-lg transition-colors ${
                         isApplyingDiscount

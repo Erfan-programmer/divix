@@ -103,9 +103,8 @@ const UserSidebar = () => {
       )}
 
       <div
-        className={`fixed inset-0 bg-black/50 bg-opacity-50 z-40 lg:hidden ${
-          isSidebarOpen ? "block" : "hidden"
-        }`}
+        className={`fixed inset-0 bg-black/50 bg-opacity-50 z-40 lg:hidden ${isSidebarOpen ? "block" : "hidden"
+          }`}
         onClick={() => setIsSidebarOpen(false)}
       />
 
@@ -138,17 +137,13 @@ const UserSidebar = () => {
 
       {/* سایدبار */}
       <div
-        className={`
-                fixed md:sticky md:top-4 h-[calc(100vh-4rem)] md:h-[80vh]
-                top-16 md:top-4 left-0 w-92 min-w-[calc(fit-content + 3rem)] bg-[#432818] rounded-lg
-                transform transition-transform duration-300 ease-in-out
-                ${
-                  isMobile
-                    ? isSidebarOpen
-                      ? "translate-x-0"
-                      : "-translate-x-full"
-                    : "translate-x-0"
-                }
+        className={`fixed md:sticky md:top-4 h-[calc(100vh-4rem)] md:h-[80vh] top-16 md:top-4 left-0 w-[85%] sm:w-92 min-w-[calc(fit-content + 3rem)] bg-[#432818] rounded-lg transform transition-transform duration-300 ease-in-out
+                ${isMobile
+            ? isSidebarOpen
+              ? "translate-x-0"
+              : "-translate-x-full"
+            : "translate-x-0"
+          }
                 z-40 md:z-0 flex flex-col
             `}
       >
@@ -179,19 +174,17 @@ const UserSidebar = () => {
                 <Link
                   key={item.href}
                   to={item.href}
-                  className={`flex items-center gap-3 space-x-3 p-4 rounded-xl transition-all duration-300 ${
-                    location.pathname === item.href
-                      ? "bg-[#FFF1CC] text-[#432818] shadow-lg"
-                      : "text-[#FFF1CC] hover:bg-[#FFF1CC]/10"
-                  }`}
+                  className={`flex items-center gap-3 space-x-3 p-4 rounded-xl transition-all duration-300 ${location.pathname === item.href
+                    ? "bg-[#FFF1CC] text-[#432818] shadow-lg"
+                    : "text-[#FFF1CC] hover:bg-[#FFF1CC]/10"
+                    }`}
                   onClick={() => isMobile && setIsSidebarOpen(false)}
                 >
                   <div
-                    className={`${
-                      location.pathname === item.href
-                        ? "text-[#432818]"
-                        : "text-[#FFF1CC]"
-                    }`}
+                    className={`${location.pathname === item.href
+                      ? "text-[#432818]"
+                      : "text-[#FFF1CC]"
+                      }`}
                   >
                     {item.icon}
                   </div>
@@ -203,24 +196,21 @@ const UserSidebar = () => {
               <div className="space-y-2">
                 <button
                   onClick={() => setIsTicketOpen(!isTicketOpen)}
-                  className={`w-full flex items-center justify-between p-4 rounded-xl transition-all duration-300 ${
-                    isTicketPath
-                      ? "bg-[#FFF1CC] text-[#432818]"
-                      : "text-[#FFF1CC] hover:bg-[#FFF1CC]/10"
-                  }`}
+                  className={`w-full flex items-center justify-between p-4 rounded-xl transition-all duration-300 ${isTicketPath
+                    ? "bg-[#FFF1CC] text-[#432818]"
+                    : "text-[#FFF1CC] hover:bg-[#FFF1CC]/10"
+                    }`}
                 >
                   <div className="flex items-center gap-3">
                     <FaTicketAlt
-                      className={`w-5 h-5 ${
-                        isTicketPath ? "text-[#432818]" : "text-[#FFF1CC]"
-                      }`}
+                      className={`w-5 h-5 ${isTicketPath ? "text-[#432818]" : "text-[#FFF1CC]"
+                        }`}
                     />
                     <span className="font-medium">تیکت‌ها</span>
                   </div>
                   <FaChevronDown
-                    className={`w-4 h-4 transition-transform duration-300 ${
-                      isTicketOpen ? "rotate-180" : ""
-                    } ${isTicketPath ? "text-[#432818]" : "text-[#FFF1CC]"}`}
+                    className={`w-4 h-4 transition-transform duration-300 ${isTicketOpen ? "rotate-180" : ""
+                      } ${isTicketPath ? "text-[#432818]" : "text-[#FFF1CC]"}`}
                   />
                 </button>
 
@@ -231,19 +221,17 @@ const UserSidebar = () => {
                       <Link
                         key={item.href}
                         to={item.href}
-                        className={`flex items-center gap-3 p-3 rounded-lg transition-all duration-300 ${
-                          location.pathname === item.href
-                            ? "bg-[#FFF1CC] text-[#432818]"
-                            : "text-[#FFF1CC] hover:bg-[#FFF1CC]/10"
-                        }`}
+                        className={`flex items-center gap-3 p-3 rounded-lg transition-all duration-300 ${location.pathname === item.href
+                          ? "bg-[#FFF1CC] text-[#432818]"
+                          : "text-[#FFF1CC] hover:bg-[#FFF1CC]/10"
+                          }`}
                         onClick={() => isMobile && setIsSidebarOpen(false)}
                       >
                         <div
-                          className={`${
-                            location.pathname === item.href
-                              ? "text-[#432818]"
-                              : "text-[#FFF1CC]"
-                          }`}
+                          className={`${location.pathname === item.href
+                            ? "text-[#432818]"
+                            : "text-[#FFF1CC]"
+                            }`}
                         >
                           {item.icon}
                         </div>

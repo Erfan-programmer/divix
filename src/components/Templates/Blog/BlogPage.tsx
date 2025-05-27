@@ -4,6 +4,7 @@ import Breadcrumb from "../../Modules/Breadcrumb";
 import { Link } from "react-router-dom";
 import moment from "moment-jalaali";
 import BlogSidebar from "./BlogSidebar";
+import { LazyLoadImage } from "react-lazy-load-image-component";
 
 interface BlogPost {
   id: number;
@@ -34,6 +35,8 @@ export default function BlogPage() {
   };
 
   useEffect(() => {
+    const abortController = new AbortController();
+
     const fetchPosts = async () => {
       try {
         setIsLoading(true);
@@ -43,24 +46,35 @@ export default function BlogPage() {
         }
 
         const response = await fetch(
-          `https://admin.mydivix.com/api/v1/posts?${params}&page=${currentPage}&per_page=10`
+          `https://admin.mydivix.com/api/v1/posts?${params}&page=${currentPage}&per_page=10`,
+          {
+            signal: abortController.signal,
+          }
         );
         const data = await response.json();
 
         if (data.success) {
           setPosts(data.result.data);
-
           setIsLoading(false);
         } else {
           setIsLoading(false);
         }
       } catch (err) {
+        if (err instanceof Error && err.name === "AbortError") {
+          console.log("درخواست مقالات لغو شد");
+          return;
+        }
+        console.error("خطا در دریافت مقالات:", err);
         setIsLoading(false);
       }
     };
 
     fetchPosts();
-  }, [searchQuery]);
+
+    return () => {
+      abortController.abort();
+    };
+  }, [searchQuery, currentPage]);
 
   const formatDate = (date: string) => {
     return moment(date).format("jYYYY/jMM/jDD");
@@ -111,7 +125,8 @@ export default function BlogPage() {
                       className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
                     >
                       <div className="relative h-48 md:h-56 xl:h-64">
-                        <img
+                        <LazyLoadImage
+                          effect="blur"
                           src={post.image}
                           alt={post.title}
                           className="object-cover w-full h-[100%]"

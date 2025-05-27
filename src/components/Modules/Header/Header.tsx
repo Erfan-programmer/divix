@@ -128,32 +128,54 @@ const Header = () => {
   const [activeCategory, setActiveCategory] = useState(0);
   const [isSearching, setIsSearching] = useState(false);
 
-  const fetchCategories = async () => {
-    const response = await fetch("https://admin.mydivix.com/api/v1/categories");
-    const data = await response.json();
+  const fetchCategories = async (signal: AbortSignal) => {
+    try {
+      const response = await fetch("https://admin.mydivix.com/api/v1/categories", {
+        signal
+      });
+      const data = await response.json();
 
-    if (data.success) {
-      setCategories(data.result.data);
-      console.log("categories =>", categories);
+      if (data.success) {
+        setCategories(data.result.data);
+      }
+    } catch (error) {
+      if (error instanceof Error && error.name === 'AbortError') {
+        console.log('درخواست دسته‌بندی‌ها لغو شد');
+        return;
+      }
+      console.error("Error fetching categories:", error);
     }
   };
-  const fetchMenus = async () => {
-    const response = await fetch("https://admin.mydivix.com/api/v1/menus");
-    const data = await response.json();
 
-    if (data.success) {
-      setMenus(data.result);
+  const fetchMenus = async (signal: AbortSignal) => {
+    try {
+      const response = await fetch("https://admin.mydivix.com/api/v1/menus", {
+        signal
+      });
+      const data = await response.json();
+
+      if (data.success) {
+        setMenus(data.result);
+      }
+    } catch (error) {
+      if (error instanceof Error && error.name === 'AbortError') {
+        console.log('درخواست منوها لغو شد');
+        return;
+      }
+      console.error("Error fetching menus:", error);
     }
   };
 
   useEffect(() => {
-    fetchCategories();
-    fetchMenus();
+    const abortController = new AbortController();
     
-    
+    fetchCategories(abortController.signal);
+    fetchMenus(abortController.signal);
+
+    return () => {
+      abortController.abort();
+    };
   }, []);
-
-
 
   const isActiveRoute = (path: string) => {
     if (path === "/products" || path === "/product") {
@@ -161,7 +183,6 @@ const Header = () => {
     }
     return location.pathname === path;
   };
-
 
   useEffect(() => {
     const handleScroll = () => {
@@ -208,13 +229,14 @@ const Header = () => {
     debounce(async (query: string) => {
       if (query.length > 2) {
         setIsSearching(true);
+        const abortController = new AbortController();
         try {
           const response = await fetch(
-            `https://admin.mydivix.com/api/v1/search/products?q=${encodeURIComponent(query)}`
+            `https://admin.mydivix.com/api/v1/search/products?q=${encodeURIComponent(query)}`,
+            { signal: abortController.signal }
           );
           const data = await response.json();
           
-          console.log("data  =>" ,  data);
           if (data.success) {
             setSearchResults(data.result.data.map((item: any) => ({
               id: item.id,
@@ -228,7 +250,11 @@ const Header = () => {
             toast.error('خطا در دریافت نتایج جستجو');
           }
         } catch (error) {
-          console.error('خطا در جستجdxxdswdxو:', error);
+          if (error instanceof Error && error.name === 'AbortError') {
+            console.log('درخواست جستجو لغو شد');
+            return;
+          }
+          console.error('خطا در جستجو:', error);
           toast.error('خطا در جستجو');
           setSearchResults([]);
         } finally {

@@ -34,6 +34,7 @@ export default function HeroSection() {
       } else {
       }
     } catch (error) {
+      console.error("Error fetching slides:", error);
     } finally {
       setIsLoading(false);
     }

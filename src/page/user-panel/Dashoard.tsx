@@ -1,13 +1,10 @@
 import { useState, useEffect } from "react";
+import { FaHeart, FaShoppingBag, FaChevronLeft, FaUser } from "react-icons/fa";
 import {
-  FaHeart,
-  FaShoppingBag,
-  FaChevronLeft,
-  FaUser,
-} from "react-icons/fa";
+  LazyLoadImage,
+} from "react-lazy-load-image-component";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-
 
 // نوع داده برای محصول مورد علاقه
 interface FavoriteProduct {
@@ -36,7 +33,7 @@ const Dashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchFavoriteProducts = async () => {
+  const fetchFavoriteProducts = async (signal?: AbortSignal) => {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
@@ -47,6 +44,7 @@ const Dashboard = () => {
             "x-api-key": "9anHzmriziuiUjNcwICqB7b1MDJa6xV3uQzOmZWy",
             Authorization: `Bearer ${token}`,
           },
+          signal,
         }
       );
 
@@ -66,13 +64,16 @@ const Dashboard = () => {
         setFavoriteProducts(data.result.data);
       }
     } catch (err) {
+      if (err instanceof Error && err.name === "AbortError") {
+        return;
+      }
       setError(
         err instanceof Error ? err.message : "خطا در دریافت محصولات مورد علاقه"
       );
     }
   };
 
-  const fetchRecentOrders = async () => {
+  const fetchRecentOrders = async (signal?: AbortSignal) => {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
@@ -83,6 +84,7 @@ const Dashboard = () => {
             "x-api-key": "9anHzmriziuiUjNcwICqB7b1MDJa6xV3uQzOmZWy",
             Authorization: `Bearer ${token}`,
           },
+          signal,
         }
       );
 
@@ -102,18 +104,21 @@ const Dashboard = () => {
         setRecentOrders(data.result.data);
       }
     } catch (err) {
+      if (err instanceof Error && err.name === "AbortError") {
+        return;
+      }
       setError(err instanceof Error ? err.message : "خطا در دریافت سفارشات");
     }
   };
 
   useEffect(() => {
+    const abortController = new AbortController();
     const fetchData = async () => {
       setIsLoading(true);
       try {
         await Promise.all([
-          // fetchRecentTickets(), // کامنت شده
-          fetchFavoriteProducts(),
-          fetchRecentOrders(),
+          fetchFavoriteProducts(abortController.signal),
+          fetchRecentOrders(abortController.signal),
         ]);
       } catch (err) {
         setError(err instanceof Error ? err.message : "خطا در دریافت اطلاعات");
@@ -121,8 +126,10 @@ const Dashboard = () => {
         setIsLoading(false);
       }
     };
-
     fetchData();
+    return () => {
+      abortController.abort();
+    };
   }, []);
 
   // تبدیل وضعیت سفارش به متن فارسی
@@ -257,7 +264,8 @@ const Dashboard = () => {
                     className="bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors"
                   >
                     <div className="aspect-square mb-3">
-                      <img
+                      <LazyLoadImage
+                        effect="blur"
                         src={product.image}
                         alt={product.title}
                         className="w-full h-full object-cover rounded-lg"

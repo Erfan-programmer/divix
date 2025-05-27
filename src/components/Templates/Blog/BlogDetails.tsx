@@ -10,7 +10,7 @@ import { IoDocumentText } from "react-icons/io5";
 import { useEffect, useState } from "react";
 import moment from "moment-jalaali";
 import { Toaster } from "react-hot-toast";
-
+import { LazyLoadImage } from "react-lazy-load-image-component";
 
 interface RelatedPost {
   id: number;
@@ -48,13 +48,18 @@ export default function BlogDetail() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [shareUrl, setShareUrl] = useState("");
-  const { id } = useParams()
+  const { id } = useParams();
   useEffect(() => {
+    const abortController = new AbortController();
+
     const fetchPost = async () => {
       try {
         setLoading(true);
         const response = await fetch(
-          `https://admin.mydivix.com/api/v1/posts/${id}`
+          `https://admin.mydivix.com/api/v1/posts/${id}`,
+          {
+            signal: abortController.signal,
+          }
         );
 
         if (!response.ok) {
@@ -70,6 +75,10 @@ export default function BlogDetail() {
           setError(data.message || "خطا در دریافت مقاله");
         }
       } catch (err) {
+        if (err instanceof Error && err.name === "AbortError") {
+          console.log("درخواست مقاله لغو شد");
+          return;
+        }
         console.error("Error fetching post:", err);
         setError("خطا در دریافت مقاله");
       } finally {
@@ -80,6 +89,10 @@ export default function BlogDetail() {
     if (id) {
       fetchPost();
     }
+
+    return () => {
+      abortController.abort();
+    };
   }, [id]);
 
   useEffect(() => {
@@ -93,8 +106,7 @@ export default function BlogDetail() {
     navigator.clipboard
       .writeText(shareUrl)
       .then(() => {
-        setTimeout(() => {
-        }, 2000);
+        setTimeout(() => {}, 2000);
       })
       .catch((error) => {
         console.error("خطا در کپی کردن لینک:", error);
@@ -104,7 +116,6 @@ export default function BlogDetail() {
   const formatDate = (date: string) => {
     return moment(date).format("jYYYY/jMM/jDD");
   };
-
 
   if (loading) {
     return (
@@ -214,8 +225,6 @@ export default function BlogDetail() {
                     className="prose max-w-none text-[#432818]"
                     dangerouslySetInnerHTML={{ __html: post.content }}
                   />
-
-      
                 </div>
               </article>
             </div>
@@ -237,7 +246,8 @@ export default function BlogDetail() {
                           className="flex gap-4 hover:bg-gray-50 p-2 rounded-lg transition-colors"
                         >
                           <div className="relative w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
-                            <img
+                            <LazyLoadImage
+                              effect="blur"
                               src={relatedPost.image}
                               alt={relatedPost.title}
                               className="object-cover"

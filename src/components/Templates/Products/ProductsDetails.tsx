@@ -24,10 +24,15 @@ import {
 } from "@mui/material";
 import { useParams } from "react-router-dom";
 import { useCart } from "../../../ContextApi/CartProvider";
-import { addToCart, removeFromCart, updateCartItemQuantity } from "./../../../utils/Cart"
-import type { ProductDetail } from '../../../types/Product';
+import {
+  addToCart,
+  removeFromCart,
+  updateCartItemQuantity,
+} from "./../../../utils/Cart";
+import type { ProductDetail } from "../../../types/Product";
+import { LazyLoadImage } from "react-lazy-load-image-component";
 
-const StyledAccordion = styled(Accordion)(({ }) => ({
+const StyledAccordion = styled(Accordion)(({}) => ({
   border: "1px solid #fff1cc",
   borderRadius: "0.5rem",
   marginBottom: "1rem",
@@ -36,14 +41,14 @@ const StyledAccordion = styled(Accordion)(({ }) => ({
   },
 })) as typeof Accordion;
 
-const StyledAccordionSummary = styled(AccordionSummary)(({ }) => ({
+const StyledAccordionSummary = styled(AccordionSummary)(({}) => ({
   padding: "1rem",
   "& .MuiAccordionSummary-content": {
     margin: 0,
   },
 })) as typeof AccordionSummary;
 
-const StyledAccordionDetails = styled(AccordionDetails)(({ }) => ({
+const StyledAccordionDetails = styled(AccordionDetails)(({}) => ({
   padding: "1rem",
   borderTop: "1px solid #fff1cc",
 })) as typeof AccordionDetails;
@@ -147,10 +152,10 @@ const accordionItems: AccordionItem[] = [
 const ReviewStatus = {
   PENDING: "pending",
   APPROVED: "approved",
-  REJECTED: "rejected"
+  REJECTED: "rejected",
 } as const;
 
-type ReviewStatusType = typeof ReviewStatus[keyof typeof ReviewStatus];
+type ReviewStatusType = (typeof ReviewStatus)[keyof typeof ReviewStatus];
 
 interface Review {
   id: number;
@@ -208,7 +213,7 @@ const ReviewItem = ({ review }: { review: Review }) => (
               {review.user.first_name} {review.user.last_name}
             </h4>
             <span className="text-sm text-[#473e39]">
-              {new Date(review.created_at).toLocaleDateString('fa-IR')}
+              {new Date(review.created_at).toLocaleDateString("fa-IR")}
             </span>
           </div>
           <Rating
@@ -462,7 +467,10 @@ const ProductDetailsSkeleton = () => (
       <div className="space-y-2 md:space-y-4">
         <div className="grid grid-cols-2 gap-2 md:gap-4">
           {[1, 2, 3, 4].map((item) => (
-            <div key={item} className="relative h-[20vh] md:h-[30vh] md:h-[60vh] bg-gray-200 rounded-lg animate-pulse"></div>
+            <div
+              key={item}
+              className="relative h-[20vh] md:h-[30vh] md:h-[60vh] bg-gray-200 rounded-lg animate-pulse"
+            ></div>
           ))}
         </div>
       </div>
@@ -483,7 +491,10 @@ const ProductDetailsSkeleton = () => (
               <div className="h-5 w-24 bg-gray-200 rounded animate-pulse"></div>
               <div className="flex gap-2">
                 {[1, 2, 3].map((attr) => (
-                  <div key={attr} className="h-8 w-16 bg-gray-200 rounded animate-pulse"></div>
+                  <div
+                    key={attr}
+                    className="h-8 w-16 bg-gray-200 rounded animate-pulse"
+                  ></div>
                 ))}
               </div>
             </div>
@@ -493,7 +504,10 @@ const ProductDetailsSkeleton = () => (
         {/* قیمت‌ها اسکلتون */}
         <div className="space-y-2">
           {[1, 2].map((item) => (
-            <div key={item} className="h-16 bg-gray-200 rounded animate-pulse"></div>
+            <div
+              key={item}
+              className="h-16 bg-gray-200 rounded animate-pulse"
+            ></div>
           ))}
         </div>
 
@@ -503,7 +517,10 @@ const ProductDetailsSkeleton = () => (
         {/* اطلاعات تکمیلی اسکلتون */}
         <div className="space-y-2">
           {[1, 2, 3].map((item) => (
-            <div key={item} className="h-6 bg-gray-200 rounded animate-pulse"></div>
+            <div
+              key={item}
+              className="h-6 bg-gray-200 rounded animate-pulse"
+            ></div>
           ))}
         </div>
       </div>
@@ -515,7 +532,9 @@ export default function ProductsDetails() {
   const [quantity, setQuantity] = useState(0);
   const { id } = useParams();
   const [cartCounts, setCartCounts] = useState<{ [key: number]: number }>({});
-  const [productData, setProductData] = useState<ExtendedProductData | null>(null);
+  const [productData, setProductData] = useState<ExtendedProductData | null>(
+    null
+  );
   const [isLoading, setIsLoading] = useState(true);
   const [expanded, setExpanded] = useState<string | false>(false);
   const [showReviewForm, setShowReviewForm] = useState(false);
@@ -540,7 +559,7 @@ export default function ProductsDetails() {
     if (!cartData) return;
     const newCartCounts: { [key: number]: number } = {};
 
-    cartData.forEach(item => {
+    cartData.forEach((item) => {
       if (item.price?.id) {
         newCartCounts[item.price.id] = item.quantity;
       }
@@ -567,25 +586,30 @@ export default function ProductsDetails() {
         }
       );
       const data = await response.json();
-      setCartCounts(prev => ({
+      setCartCounts((prev) => ({
         ...prev,
-        [priceId]: data || 0
+        [priceId]: data || 0,
       }));
     } catch (error) {
       console.error("خطا در دریافت تعداد محصول:", error);
-      setCartCounts(prev => ({
+      setCartCounts((prev) => ({
         ...prev,
-        [priceId]: 0
+        [priceId]: 0,
       }));
     }
   };
 
   useEffect(() => {
+    const abortController = new AbortController();
+
     const fetchProductDetail = async () => {
       try {
         setIsLoading(true);
         const response = await fetch(
-          `https://admin.mydivix.com/api/v1/products/${id}`
+          `https://admin.mydivix.com/api/v1/products/${id}`,
+          {
+            signal: abortController.signal,
+          }
         );
         const data: ApiProductResponse = await response.json();
 
@@ -594,9 +618,8 @@ export default function ProductsDetails() {
           setSelectedPrice(firstPrice);
           await getProductCartCount(firstPrice.id);
 
-          // تنظیم ویژگی‌های پیش‌فرض برای اولین قیمت
           const initialAttributes: { [key: string]: string } = {};
-          firstPrice.attributes.forEach(attr => {
+          firstPrice.attributes.forEach((attr) => {
             initialAttributes[attr.group.name] = attr.name;
           });
           setSelectedAttributes(initialAttributes);
@@ -610,11 +633,15 @@ export default function ProductsDetails() {
             inStock: data.result.is_available,
             dateAdded: new Date().toISOString(),
             discount: firstPrice?.discount || 0,
-            slug: data.result.title.replace(/\s+/g, '-').toLowerCase(),
+            slug: data.result.title.replace(/\s+/g, "-").toLowerCase(),
           });
           setIsLoading(false);
         }
       } catch (error) {
+        if (error instanceof Error && error.name === "AbortError") {
+          console.log("درخواست لغو شد");
+          return;
+        }
         console.error("Error fetching product:", error);
         setIsLoading(false);
       }
@@ -623,6 +650,10 @@ export default function ProductsDetails() {
     if (id) {
       fetchProductDetail();
     }
+
+    return () => {
+      abortController.abort();
+    };
   }, [id]);
 
   useEffect(() => {
@@ -683,14 +714,15 @@ export default function ProductsDetails() {
     setQuantity(0);
   };
 
-  const handleAccordionChange = (panel: string) => (_: React.SyntheticEvent, isExpanded: boolean) => {
-    setExpanded(isExpanded ? panel : false);
+  const handleAccordionChange =
+    (panel: string) => (_: React.SyntheticEvent, isExpanded: boolean) => {
+      setExpanded(isExpanded ? panel : false);
 
-    // اگر پنل نظرات باز شد، نظرات را دریافت کن
-    if (panel === 'panelreviews' && isExpanded) {
-      fetchReviews();
-    }
-  };
+      // اگر پنل نظرات باز شد، نظرات را دریافت کن
+      if (panel === "panelreviews" && isExpanded) {
+        fetchReviews();
+      }
+    };
 
   const handleShowReviewForm = () => {
     setShowReviewForm(true);
@@ -719,14 +751,14 @@ export default function ProductsDetails() {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${localStorage.getItem("token")}`,
-            "Accept": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            Accept: "application/json",
             "x-api-key": "9anHzmriziuiUjNcwICqB7b1MDJa6xV3uQzOmZWy",
           },
           body: JSON.stringify({
             title: review.title,
             body: review.body,
-            rating: review.rating
+            rating: review.rating,
           }),
         }
       );
@@ -758,7 +790,7 @@ export default function ProductsDetails() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Accept": "application/json",
+          Accept: "application/json",
           "cart-id": `${localStorage.getItem("cart-id")}`,
         },
         body: JSON.stringify({
@@ -772,10 +804,10 @@ export default function ProductsDetails() {
       if (data.success) {
         toast.success("محصول به سبد خرید اضافه شد");
         await fetchCart();
-        await addToCart(selectedPrice?.id as number, 1)
-        setCartCounts(prev => ({
+        await addToCart(selectedPrice?.id as number, 1);
+        setCartCounts((prev) => ({
           ...prev,
-          [price.id]: (prev[price.id] || 0) + 1
+          [price.id]: (prev[price.id] || 0) + 1,
         }));
         setIsUpdatingQuantity(false);
         setQuantity(1);
@@ -813,10 +845,10 @@ export default function ProductsDetails() {
         const data = await response.json();
         if (data.success) {
           await fetchCart();
-          await removeFromCart(selectedPrice?.id as number,)
-          setCartCounts(prev => ({
+          await removeFromCart(selectedPrice?.id as number);
+          setCartCounts((prev) => ({
             ...prev,
-            [price.id]: 0
+            [price.id]: 0,
           }));
           toast.success("محصول با موفقیت از سبد خرید حذف شد");
         } else {
@@ -844,17 +876,17 @@ export default function ProductsDetails() {
 
       const data = await response.json();
       if (response.status === 422) {
-        toast.error('تعداد محصول در انبار تمام شده است');
+        toast.error("تعداد محصول در انبار تمام شده است");
         return;
       }
       if (data.success) {
         await fetchCart();
-        setCartCounts(prev => ({
+        setCartCounts((prev) => ({
           ...prev,
-          [price.id]: newQuantity
+          [price.id]: newQuantity,
         }));
         toast.success("تعداد محصول با موفقیت بروزرسانی شد");
-        await updateCartItemQuantity(selectedPrice?.id as number, newQuantity)
+        await updateCartItemQuantity(selectedPrice?.id as number, newQuantity);
       } else {
         console.error("خطا در بروزرسانی تعداد:", data.message);
         toast.error("تعداد این محصول در انبار به پایان رسیده است");
@@ -870,6 +902,8 @@ export default function ProductsDetails() {
   const fetchReviews = async (page: number = 1) => {
     if (!productData) return;
 
+    const abortController = new AbortController();
+
     try {
       setIsLoadingReviews(true);
       setReviewsError(null);
@@ -878,37 +912,53 @@ export default function ProductsDetails() {
         `https://admin.mydivix.com/api/v1/products/${productData?.id}/reviews?page=${page}`,
         {
           headers: {
-            'accept': 'application/json',
-            'x-api-key': '9anHzmriziuiUjNcwICqB7b1MDJa6xV3uQzOmZWy',
+            accept: "application/json",
+            "x-api-key": "9anHzmriziuiUjNcwICqB7b1MDJa6xV3uQzOmZWy",
           },
+          signal: abortController.signal,
         }
       );
 
       const data: ReviewResponse = await response.json();
       if (data.success) {
         // فیلتر کردن نظرات pending
-        const approvedReviews = data.result.data.filter(review => review.status === ReviewStatus.APPROVED);
+        const approvedReviews = data.result.data.filter(
+          (review) => review.status === ReviewStatus.APPROVED
+        );
         setReviews(approvedReviews);
         setTotalPages(data.result.last_page);
         setCurrentPage(data.result.current_page);
       } else {
-        setReviewsError(data.message || 'خطا در دریافت نظرات');
+        setReviewsError(data.message || "خطا در دریافت نظرات");
       }
     } catch (err) {
-      setReviewsError('خطا در ارتباط با سرور');
+      if (err instanceof Error && err.name === "AbortError") {
+        console.log("درخواست نظرات لغو شد");
+        return;
+      }
+      setReviewsError("خطا در ارتباط با سرور");
     } finally {
       setIsLoadingReviews(false);
     }
+
+    return () => {
+      abortController.abort();
+    };
   };
 
   useEffect(() => {
+    const abortController = new AbortController();
+
     const fetchRelatedProducts = async () => {
       if (!productData) return;
 
       try {
         setIsLoadingRelated(true);
         const response = await fetch(
-          `https://admin.mydivix.com/api/v1/products/${productData?.id}/relatedProducts`
+          `https://admin.mydivix.com/api/v1/products/${productData?.id}/relatedProducts`,
+          {
+            signal: abortController.signal,
+          }
         );
         const data = await response.json();
 
@@ -916,6 +966,10 @@ export default function ProductsDetails() {
           setRelatedProducts(data.data);
         }
       } catch (error) {
+        if (error instanceof Error && error.name === "AbortError") {
+          console.log("درخواست محصولات مرتبط لغو شد");
+          return;
+        }
         console.error("Error fetching related products:", error);
       } finally {
         setIsLoadingRelated(false);
@@ -923,6 +977,10 @@ export default function ProductsDetails() {
     };
 
     fetchRelatedProducts();
+
+    return () => {
+      abortController.abort();
+    };
   }, [productData]);
 
   return (
@@ -968,7 +1026,8 @@ export default function ProductsDetails() {
                     key={image.id}
                     className={`relative h-[20vh] md:h-[30vh] md:h-[60vh] cursor-pointer`}
                   >
-                    <img
+                    <LazyLoadImage
+                      effect="blur"
                       src={image.image}
                       alt={`${productData?.title} ${index + 1}`}
                       className="object-cover rounded-lg"
@@ -990,24 +1049,32 @@ export default function ProductsDetails() {
                 </h1>
               </div>
               <div
-                dangerouslySetInnerHTML={{ __html: productData?.description as string }}
+                dangerouslySetInnerHTML={{
+                  __html: productData?.description as string,
+                }}
                 className="text-sm md:text-base text-[#473e39]"
               />
 
               {/* انتخاب ویژگی‌ها */}
               <div className="space-y-8">
                 {getAttributeGroups().map((group) => (
-                  <div key={group.name} className="space-y-1 flex justify-between items-center">
+                  <div
+                    key={group.name}
+                    className="space-y-1 flex justify-between items-center"
+                  >
                     <h3 className="text-base md:text-lg font-bold text-[#171717] flex items-center gap-2">
                       <span className="w-1.5 h-6 bg-[#7a4522] rounded-full"></span>
                       {group.name}:
                     </h3>
-                    <div className={`flex flex-wrap gap-4 ${group.type === "color"
-                      ? "justify-start"
-                      : group.type === "size"
-                        ? "justify-center"
-                        : "justify-end"
-                      }`}>
+                    <div
+                      className={`flex flex-wrap gap-4 ${
+                        group.type === "color"
+                          ? "justify-start"
+                          : group.type === "size"
+                          ? "justify-center"
+                          : "justify-end"
+                      }`}
+                    >
                       {getUniqueAttributes(group.name).map((attrName) => {
                         const price = productData?.prices.find((p) =>
                           p.attributes.some(
@@ -1026,41 +1093,63 @@ export default function ProductsDetails() {
                               handleAttributeChange(group.name, attrName);
                               setSelectedPrice(price || null);
                             }}
-                            className={`transition-all duration-300 ${group.type === "color"
-                              ? `w-10 h-10 rounded-full shadow-md hover:shadow-lg ${selectedAttributes[group.name] === attrName
-                                ? "ring-4 ring-[#7a4522] ring-offset-2 scale-110"
-                                : "hover:scale-105"
-                              }`
-                              : group.type === "size"
-                                ? `w-12 h-12 rounded-lg border-2 font-bold text-lg ${selectedAttributes[group.name] === attrName
-                                  ? "border-[#7a4522] bg-[#fff1cc] text-[#7a4522] shadow-md"
-                                  : "border-[#e5e7eb] hover:border-[#7a4522] hover:bg-[#fff1cc]/20 text-[#4b5563] hover:text-[#7a4522]"
-                                }`
-                                : `px-5 py-2.5 rounded-xl border-2 font-medium text-sm md:text-base ${selectedAttributes[group.name] === attrName
-                                  ? "border-[#7a4522] bg-[#fff1cc] text-[#7a4522] shadow-md"
-                                  : "border-[#e5e7eb] hover:border-[#7a4522] hover:bg-[#fff1cc]/20 text-[#4b5563] hover:text-[#7a4522]"
-                                }`
-                              }`}
+                            className={`transition-all duration-300 ${
+                              group.type === "color"
+                                ? `w-10 h-10 rounded-full shadow-md hover:shadow-lg ${
+                                    selectedAttributes[group.name] === attrName
+                                      ? "ring-4 ring-[#7a4522] ring-offset-2 scale-110"
+                                      : "hover:scale-105"
+                                  }`
+                                : group.type === "size"
+                                ? `w-12 h-12 rounded-lg border-2 font-bold text-lg ${
+                                    selectedAttributes[group.name] === attrName
+                                      ? "border-[#7a4522] bg-[#fff1cc] text-[#7a4522] shadow-md"
+                                      : "border-[#e5e7eb] hover:border-[#7a4522] hover:bg-[#fff1cc]/20 text-[#4b5563] hover:text-[#7a4522]"
+                                  }`
+                                : `px-5 py-2.5 rounded-xl border-2 font-medium text-sm md:text-base ${
+                                    selectedAttributes[group.name] === attrName
+                                      ? "border-[#7a4522] bg-[#fff1cc] text-[#7a4522] shadow-md"
+                                      : "border-[#e5e7eb] hover:border-[#7a4522] hover:bg-[#fff1cc]/20 text-[#4b5563] hover:text-[#7a4522]"
+                                  }`
+                            }`}
                             style={
                               group.type === "color" && attr
                                 ? {
-                                    backgroundColor: attr.value ? attr.value : '#fff',
-                                    boxShadow: selectedAttributes[group.name] === attrName
-                                      ? '0 0 0 4px #fff1cc'
-                                      : '0 2px 4px rgba(0,0,0,0.1)'
+                                    backgroundColor: attr.value
+                                      ? attr.value
+                                      : "#fff",
+                                    boxShadow:
+                                      selectedAttributes[group.name] ===
+                                      attrName
+                                        ? "0 0 0 4px #fff1cc"
+                                        : "0 2px 4px rgba(0,0,0,0.1)",
                                   }
                                 : undefined
                             }
                           >
                             {group.type !== "color" && (
-                              <span className={`flex items-center gap-2 ${group.type === "size" ? "justify-center" : ""
-                                }`}>
+                              <span
+                                className={`flex items-center gap-2 ${
+                                  group.type === "size" ? "justify-center" : ""
+                                }`}
+                              >
                                 {attrName}
-                                {selectedAttributes[group.name] === attrName && group.type !== "size" && (
-                                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                                  </svg>
-                                )}
+                                {selectedAttributes[group.name] === attrName &&
+                                  group.type !== "size" && (
+                                    <svg
+                                      className="w-4 h-4"
+                                      fill="none"
+                                      stroke="currentColor"
+                                      viewBox="0 0 24 24"
+                                    >
+                                      <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth="2"
+                                        d="M5 13l4 4L19 7"
+                                      />
+                                    </svg>
+                                  )}
                               </span>
                             )}
                           </button>
@@ -1077,10 +1166,11 @@ export default function ProductsDetails() {
                   {availablePrices.map((price) => (
                     <div
                       key={price.id}
-                      className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${selectedPrice?.id === price.id
-                        ? "border-[#7a4522] bg-[#fff1cc]/10"
-                        : "border-[#fff1cc] hover:border-[#7a4522]"
-                        }`}
+                      className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${
+                        selectedPrice?.id === price.id
+                          ? "border-[#7a4522] bg-[#fff1cc]/10"
+                          : "border-[#fff1cc] hover:border-[#7a4522]"
+                      }`}
                       onClick={() => handlePriceSelect(price)}
                     >
                       <div className="flex justify-between items-center mb-2">
@@ -1127,21 +1217,37 @@ export default function ProductsDetails() {
                     <div className="flex items-center gap-4">
                       <div className="flex items-center gap-2 bg-white/[0.02] rounded-lg p-2">
                         <button
-                          onClick={() => handleQuantityChange(
-                            cartCounts[selectedPrice.id] === 1 ? 0 : cartCounts[selectedPrice.id] - 1,
-                            selectedPrice
-                          )}
+                          onClick={() =>
+                            handleQuantityChange(
+                              cartCounts[selectedPrice.id] === 1
+                                ? 0
+                                : cartCounts[selectedPrice.id] - 1,
+                              selectedPrice
+                            )
+                          }
                           disabled={isUpdatingQuantity}
                           className={`w-8 h-8 sm:w-9 sm:h-9 rounded-md flex items-center justify-center transition-all duration-300 bg-[var(--primary)] disabled:opacity-50 disabled:cursor-not-allowed`}
                         >
-                          {cartCounts[selectedPrice.id] === 1 ? <FaTrash size={12} /> : "-"}
+                          {cartCounts[selectedPrice.id] === 1 ? (
+                            <FaTrash size={12} />
+                          ) : (
+                            "-"
+                          )}
                         </button>
                         <span className="w-8 text-center text-sm font-medium text-[#222]">
                           {cartCounts[selectedPrice.id]}
                         </span>
                         <button
-                          onClick={() => handleQuantityChange(cartCounts[selectedPrice.id] + 1, selectedPrice)}
-                          disabled={cartCounts[selectedPrice.id] >= 10 || isUpdatingQuantity}
+                          onClick={() =>
+                            handleQuantityChange(
+                              cartCounts[selectedPrice.id] + 1,
+                              selectedPrice
+                            )
+                          }
+                          disabled={
+                            cartCounts[selectedPrice.id] >= 10 ||
+                            isUpdatingQuantity
+                          }
                           className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[var(--primary)] flex items-center justify-center transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           {isUpdatingQuantity ? (
@@ -1248,14 +1354,20 @@ export default function ProductsDetails() {
                                 ))}
                               </div>
                             ) : reviewsError ? (
-                              <div className="text-center text-red-500 py-4">{reviewsError}</div>
+                              <div className="text-center text-red-500 py-4">
+                                {reviewsError}
+                              </div>
                             ) : reviews?.length === 0 ? (
                               <div className="text-center py-8">
                                 <FaComment className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                                <p className="text-gray-500">هنوز نظری برای این محصول ثبت نشده است</p>
+                                <p className="text-gray-500">
+                                  هنوز نظری برای این محصول ثبت نشده است
+                                </p>
                               </div>
                             ) : (
-                              reviews?.map((review) => <ReviewItem key={review.id} review={review} />)
+                              reviews?.map((review) => (
+                                <ReviewItem key={review.id} review={review} />
+                              ))
                             )}
 
                             {showReviewForm && (
@@ -1304,12 +1416,17 @@ export default function ProductsDetails() {
           {/* بخش محصولات مرتبط */}
           {relatedProducts?.length > 0 && (
             <div className="mt-16">
-              <h2 className="text-2xl font-bold text-[#432818] mb-8">محصولات مرتبط</h2>
+              <h2 className="text-2xl font-bold text-[#432818] mb-8">
+                محصولات مرتبط
+              </h2>
 
               {isLoadingRelated ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                   {[1, 2, 3, 4].map((item) => (
-                    <div key={item} className="bg-white rounded-xl p-4 animate-pulse">
+                    <div
+                      key={item}
+                      className="bg-white rounded-xl p-4 animate-pulse"
+                    >
                       <div className="h-48 bg-gray-200 rounded-lg mb-4"></div>
                       <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
                       <div className="h-4 bg-gray-200 rounded w-1/2"></div>
@@ -1325,7 +1442,8 @@ export default function ProductsDetails() {
                       className="bg-white rounded-xl p-4 hover:shadow-lg transition-shadow"
                     >
                       <div className="aspect-square relative rounded-lg overflow-hidden mb-4">
-                        <img
+                        <LazyLoadImage
+                          effect="blur"
                           src={product?.image || "/images/placeholder.jpg"}
                           alt={product?.title}
                           className="object-cover"

@@ -152,13 +152,14 @@ export const ShippingCart = () => {
     }));
   };
 
-  const fetchCart = async () => {
+  const fetchCart = async (signal?: AbortSignal) => {
     try {
       setIsLoading(true);
       const response = await fetch("https://admin.mydivix.com/api/v1/cart", {
         headers: {
           "cart-id": `${localStorage.getItem("cart-id")}`,
         },
+        signal
       });
       const data = await response.json();
 
@@ -167,6 +168,9 @@ export const ShippingCart = () => {
         console.log("cartData", data.result.products);
       }
     } catch (err) {
+      if (err instanceof Error && err.name === 'AbortError') {
+        return;
+      }
       setError("خطا در دریافت اطلاعات سبد خرید");
     } finally {
       setIsLoading(false);
@@ -174,12 +178,16 @@ export const ShippingCart = () => {
   };
 
   useEffect(() => {
-    fetchCart();
+    const abortController = new AbortController();
+    fetchCart(abortController.signal);
+    return () => {
+      abortController.abort();
+    };
   }, []);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    const getUserInfo = async () => {
+    const getUserInfo = async (signal?: AbortSignal) => {
       try {
         const response = await fetch("https://admin.mydivix.com/api/v1/user", {
           headers: {
@@ -187,6 +195,7 @@ export const ShippingCart = () => {
             accept: "application/json",
             "x-api-key": "9anHzmriziuiUjNcwICqB7b1MDJa6xV3uQzOmZWy",
           },
+          signal
         });
 
         if (!response.ok) {
@@ -229,6 +238,7 @@ export const ShippingCart = () => {
                   "x-api-key": "9anHzmriziuiUjNcwICqB7b1MDJa6xV3uQzOmZWy",
                   Authorization: `Bearer ${token}`,
                 },
+                signal
               }
             );
 
@@ -239,18 +249,25 @@ export const ShippingCart = () => {
           }
         }
       } catch (err) {
+        if (err instanceof Error && err.name === 'AbortError') {
+          return;
+        }
         console.error("Error fetching user data:", err);
         toast.error("خطا در دریافت اطلاعات کاربر");
       }
     };
 
     if (token) {
-      getUserInfo();
+      const abortController = new AbortController();
+      getUserInfo(abortController.signal);
+      return () => {
+        abortController.abort();
+      };
     }
   }, []);
 
   useEffect(() => {
-    const fetchProvinces = async () => {
+    const fetchProvinces = async (signal?: AbortSignal) => {
       try {
         const response = await fetch(
           "https://admin.mydivix.com/api/v1/provinces",
@@ -260,6 +277,7 @@ export const ShippingCart = () => {
               "x-api-key": "9anHzmriziuiUjNcwICqB7b1MDJa6xV3uQzOmZWy",
               Authorization: `Bearer ${localStorage.getItem("token")}`,
             },
+            signal
           }
         );
 
@@ -270,15 +288,22 @@ export const ShippingCart = () => {
         const data = await response.json();
         setProvinces(data.result.data);
       } catch (err) {
+        if (err instanceof Error && err.name === 'AbortError') {
+          return;
+        }
         toast.error("خطا در دریافت لیست استان‌ها");
       }
     };
 
-    fetchProvinces();
+    const abortController = new AbortController();
+    fetchProvinces(abortController.signal);
+    return () => {
+      abortController.abort();
+    };
   }, []);
 
   useEffect(() => {
-    const fetchCities = async (provinceId: number) => {
+    const fetchCities = async (provinceId: number, signal?: AbortSignal) => {
       try {
         const response = await fetch(
           `https://admin.mydivix.com/api/v1/provinces/${provinceId}/cities`,
@@ -288,6 +313,7 @@ export const ShippingCart = () => {
               "x-api-key": "9anHzmriziuiUjNcwICqB7b1MDJa6xV3uQzOmZWy",
               Authorization: `Bearer ${localStorage.getItem("token")}`,
             },
+            signal
           }
         );
 
@@ -298,12 +324,19 @@ export const ShippingCart = () => {
         const data = await response.json();
         setCities(data.result.data);
       } catch (err) {
+        if (err instanceof Error && err.name === 'AbortError') {
+          return;
+        }
         toast.error("خطا در دریافت لیست شهرها");
       }
     };
 
     if (selectedProvinceId) {
-      fetchCities(selectedProvinceId);
+      const abortController = new AbortController();
+      fetchCities(selectedProvinceId, abortController.signal);
+      return () => {
+        abortController.abort();
+      };
     } else {
       setCities([]);
     }

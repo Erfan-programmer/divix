@@ -25,7 +25,7 @@ export const TicketDetail = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [newMessage, setNewMessage] = useState("");
 
-  const fetchTicketDetail = async () => {
+  const fetchTicketDetail = async (signal?: AbortSignal) => {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(`https://admin.mydivix.com/api/v1/tickets/${ticketId}`, {
@@ -34,6 +34,7 @@ export const TicketDetail = () => {
           accept: "application/json",
           "x-api-key": "9anHzmriziuiUjNcwICqB7b1MDJa6xV3uQzOmZWy",
         },
+        signal,
       });
 
       const data = await response.json();
@@ -44,6 +45,9 @@ export const TicketDetail = () => {
         throw new Error(data.message || "خطا در دریافت اطلاعات تیکت");
       }
     } catch (error) {
+      if (error instanceof Error && error.name === 'AbortError') {
+        return;
+      }
       toast.error(error instanceof Error ? error.message : "خطا در دریافت اطلاعات تیکت");
       navigate("/user-panel/tickets");
     } finally {
@@ -83,7 +87,12 @@ export const TicketDetail = () => {
   };
 
   useEffect(() => {
-    fetchTicketDetail();
+    const abortController = new AbortController();
+    fetchTicketDetail(abortController.signal);
+
+    return () => {
+      abortController.abort();
+    };
   }, [ticketId]);
 
   const getStatusIcon = (status: TicketDetail["status"]) => {

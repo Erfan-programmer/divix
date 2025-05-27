@@ -33,7 +33,7 @@ interface Menu {
   children: any | null;
   childrenmenus: any[];
 }
-interface userData  {
+interface userData {
   first_name: string;
   last_name: string;
   profile_photo_url: string;
@@ -54,6 +54,7 @@ interface AccordionProps {
   children: React.ReactNode;
   href?: string;
   isActiveRoute?: boolean;
+  onClick?: () => void;
 }
 
 const Accordion = ({
@@ -63,6 +64,7 @@ const Accordion = ({
   children,
   href,
   isActiveRoute,
+  onClick,
 }: AccordionProps) => {
   return (
     <div className="space-y-2">
@@ -74,11 +76,12 @@ const Accordion = ({
           <Link
             to={href}
             className={`flex-1 ${isActive
-                ? "text-[#FFF1CC]"
-                : isActiveRoute
-                  ? "text-[#7a4522]"
-                  : "text-[#473e39]"
+              ? "text-[#FFF1CC]"
+              : isActiveRoute
+                ? "text-[#7a4522]"
+                : "text-[#473e39]"
               }`}
+            onClick={onClick}
           >
             {title}
           </Link>
@@ -146,8 +149,9 @@ const MobileMenu = ({
             <FaTimes className="text-xl" />
           </button>
           <Link
-            to="/login"
+            to={userData?.first_name.length ? "/user-panel" : "/login"}
             className="flex items-center gap-2 bg-amber-500 hover:bg-amber-600 transition-colors px-4 py-2 rounded-full"
+            onClick={onClose}
           >
             {userData?.first_name?.length ? (
               <>
@@ -182,6 +186,7 @@ const MobileMenu = ({
                     }
                     href="/products"
                     isActiveRoute={isActiveRoute("/products")}
+                    onClick={onClose}
                   >
                     {categories.map((category) => (
                       <Accordion
@@ -196,12 +201,14 @@ const MobileMenu = ({
                           )
                         }
                         href={`/products?category_id=${category.id}`}
+                        onClick={onClose}
                       >
                         {category.categories.map((subCategory) => (
                           <Link
                             key={subCategory.id}
                             to={`/products?category_id=${subCategory.id}`}
                             className="flex items-center gap-3 p-2 bg-white/30 rounded-lg hover:bg-white/50 transition-colors"
+                            onClick={onClose}
                           >
                             <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
                               {subCategory.image && (
@@ -234,9 +241,10 @@ const MobileMenu = ({
                     key={menu.id}
                     to="/blogs"
                     className={`block p-2 bg-white rounded-lg ${isActiveRoute("/blog")
-                        ? "text-[#7a4522]"
-                        : "text-[#473e39]"
+                      ? "text-[#7a4522]"
+                      : "text-[#473e39]"
                       }`}
+                    onClick={onClose}
                   >
                     {menu.title}
                   </Link>
@@ -256,6 +264,7 @@ const MobileMenu = ({
                     }
                     href={menu.link || "#"}
                     isActiveRoute={isActiveRoute(menu.link || "")}
+                    onClick={onClose}
                   >
                     {menu.childrenmenus.map((childMenu) => (
                       <Accordion
@@ -269,12 +278,14 @@ const MobileMenu = ({
                               : childMenu.id
                           )
                         }
+                        onClick={onClose}
                       >
                         {childMenu.menus?.map((subMenu: SubMenu) => (
                           <Link
                             key={subMenu.id}
                             to={subMenu.link || "#"}
                             className="block p-2 bg-white/30 rounded-lg hover:bg-white/50 transition-colors text-[#473e39]"
+                            onClick={onClose}
                           >
                             {subMenu.title}
                           </Link>
@@ -290,9 +301,10 @@ const MobileMenu = ({
                   key={menu.id}
                   to={menu.link || "#"}
                   className={`block p-2 bg-white rounded-lg ${isActiveRoute(menu.link || "")
-                      ? "text-[#7a4522]"
-                      : "text-[#473e39]"
+                    ? "text-[#7a4522]"
+                    : "text-[#473e39]"
                     }`}
+                  onClick={onClose}
                 >
                   {menu.title}
                 </Link>

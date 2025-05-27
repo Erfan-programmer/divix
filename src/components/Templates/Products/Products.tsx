@@ -123,20 +123,33 @@ const ProductsPage = () => {
   }, [products, location.search, categories]);
 
   useEffect(() => {
+    const abortController = new AbortController();
+
     const fetchCategories = async () => {
       try {
         const response = await fetch(
-          "https://admin.mydivix.com/api/v1/categories"
+          "https://admin.mydivix.com/api/v1/categories",
+          {
+            signal: abortController.signal
+          }
         );
         const data = await response.json();
         if (data.success && Array.isArray(data.result.data)) {
           setCategories(data.result.data);
         }
       } catch (err) {
+        if (err instanceof Error && err.name === 'AbortError') {
+          console.log('درخواست دسته‌بندی‌ها لغو شد');
+          return;
+        }
         console.error("خطا در دریافت دسته‌بندی‌ها:", err);
       }
     };
     fetchCategories();
+
+    return () => {
+      abortController.abort();
+    };
   }, []);
 
   const handlePageChange = (url: string | null) => {
@@ -175,12 +188,13 @@ const ProductsPage = () => {
   };
 
   useEffect(() => {
+    const abortController = new AbortController();
+
     const fetchProducts = async () => {
       try {
         setIsLoading(true);
         const params = new URLSearchParams();
 
-        // فقط پارامترهای ضروری را اضافه می‌کنیم
         const searchFromUrl = searchParams[0].get("search");
         const sortFromUrl = searchParams[0].get("sort");
         const categoryId = searchParams[0].get("category_id");
@@ -199,11 +213,13 @@ const ProductsPage = () => {
           params.set("page", page);
         }
 
-        // پارامترهای ثابت
         params.set("per_page", "20");
 
         const response = await fetch(
-          `https://admin.mydivix.com/api/v1/products?${params}`
+          `https://admin.mydivix.com/api/v1/products?${params}`,
+          {
+            signal: abortController.signal
+          }
         );
         const data: ProductsResponse = await response.json();
 
@@ -216,12 +232,21 @@ const ProductsPage = () => {
           setSearchQuery(searchFromUrl || "");
         }
       } catch (err) {
+        if (err instanceof Error && err.name === 'AbortError') {
+          console.log('درخواست محصولات لغو شد');
+          return;
+        }
+        console.error("خطا در دریافت محصولات:", err);
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchProducts();
+
+    return () => {
+      abortController.abort();
+    };
   }, [searchParams[0]]);
 
   const breadcrumbItems = [{ title: "محصولات" }];
@@ -251,24 +276,36 @@ const ProductsPage = () => {
       return;
     }
 
+    const abortController = new AbortController();
     setIsLoadingFilters(true);
+
     try {
       const response = await fetch(
-        `https://admin.mydivix.com/api/v1/categories/${categoryId}/filter`
+        `https://admin.mydivix.com/api/v1/categories/${categoryId}/filter`,
+        {
+          signal: abortController.signal
+        }
       );
       const data = await response.json();
 
-      console.log(data);
       if (data.success) {
         setFilters(data);
       } else {
         console.error("خطا در دریافت فیلترها:", data.message);
       }
     } catch (err) {
+      if (err instanceof Error && err.name === 'AbortError') {
+        console.log('درخواست فیلترها لغو شد');
+        return;
+      }
       console.error("خطا در دریافت فیلترها:", err);
     } finally {
       setIsLoadingFilters(false);
     }
+
+    return () => {
+      abortController.abort();
+    };
   };
 
   useEffect(() => {

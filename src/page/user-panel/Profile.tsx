@@ -130,7 +130,7 @@ const Profile = () => {
     { title: "پروفایل" },
   ];
 
-  const fetchUser = async () => {
+  const fetchUser = async (signal?: AbortSignal) => {
     try {
       const response = await fetch("https://admin.mydivix.com/api/v1/user", {
         method: "GET",
@@ -138,6 +138,7 @@ const Profile = () => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
+        signal,
       });
 
       if (response.ok) {
@@ -155,7 +156,6 @@ const Profile = () => {
           city_id: userData.address?.city?.id?.toString() || "",
         });
 
-        // اگر کاربر آدرس دارد، استان و شهر را از پیش انتخاب می‌کنیم
         if (userData.address?.province) {
           const province = {
             id: userData.address.province.id,
@@ -163,25 +163,31 @@ const Profile = () => {
             name_en: userData.address.province.name_en
           };
           setSelectedProvince(province);
-          
-          // دریافت شهرهای استان انتخاب شده
           await fetchCities(province.id);
-          
-        
         }
       }
     } catch (error) {
+      if (error instanceof Error && error.name === 'AbortError') {
+        return;
+      }
       console.error("خطا در دریافت اطلاعات کاربر:", error);
       toast.error("خطا در دریافت اطلاعات کاربر");
     }
   };
 
   useEffect(() => {
+    const abortController = new AbortController();
+    
     const initializeData = async () => {
-      await fetchProvinces();
-      await fetchUser();
+      await fetchProvinces(abortController.signal);
+      await fetchUser(abortController.signal);
     };
+    
     initializeData();
+
+    return () => {
+      abortController.abort();
+    };
   }, []);
 
   const handleSetPassword = async () => {
@@ -216,7 +222,7 @@ const Profile = () => {
     }
   };
 
-  const fetchProvinces = async () => {
+  const fetchProvinces = async (signal?: AbortSignal) => {
     try {
       setIsLoading(true);
       const response = await fetch('https://admin.mydivix.com/api/v1/provinces', {
@@ -224,13 +230,13 @@ const Profile = () => {
           'accept': 'application/json',
           'x-api-key': '9anHzmriziuiUjNcwICqB7b1MDJa6xV3uQzOmZWy',
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        }
+        },
+        signal,
       });
 
       if (response.ok) {
         const data = await response.json();
-        console.log('Provinces data:', data); // برای دیباگ
-        if (data.result.data ) {
+        if (data.result.data) {
           setProvinces(data.result.data);
         } else {
           console.error('Invalid provinces data format:', data);
@@ -238,6 +244,9 @@ const Profile = () => {
         }
       }
     } catch (error) {
+      if (error instanceof Error && error.name === 'AbortError') {
+        return;
+      }
       console.error("خطا در دریافت لیست استان‌ها:", error);
       toast.error("خطا در دریافت لیست استان‌ها");
     } finally {
@@ -245,7 +254,7 @@ const Profile = () => {
     }
   };
 
-  const fetchCities = async (provinceId: number) => {
+  const fetchCities = async (provinceId: number, signal?: AbortSignal) => {
     try {
       setIsLoading(true);
       const response = await fetch(`https://admin.mydivix.com/api/v1/provinces/${provinceId}/cities`, {
@@ -253,13 +262,13 @@ const Profile = () => {
           'accept': 'application/json',
           'x-api-key': '9anHzmriziuiUjNcwICqB7b1MDJa6xV3uQzOmZWy',
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        }
+        },
+        signal,
       });
 
       if (response.ok) {
         const data = await response.json();
         if (data.result.data) {
-          // مرتب‌سازی شهرها بر اساس ordering
           const sortedCities = data.result.data.sort((a: City, b: City) => a.ordering - b.ordering);
           setCities(sortedCities);
         } else {
@@ -268,6 +277,9 @@ const Profile = () => {
         }
       }
     } catch (error) {
+      if (error instanceof Error && error.name === 'AbortError') {
+        return;
+      }
       console.error("خطا در دریافت لیست شهرها:", error);
       toast.error("خطا در دریافت لیست شهرها");
     } finally {
@@ -285,9 +297,10 @@ const Profile = () => {
       city_id: ""
     }));
 
-    // اگر استان انتخاب شده است، شهرهای آن را دریافت می‌کنیم
     if (provinceId) {
-      await fetchCities(parseInt(provinceId));
+      const abortController = new AbortController();
+      await fetchCities(parseInt(provinceId), abortController.signal);
+      return () => abortController.abort();
     } else {
       setCities([]);
     }

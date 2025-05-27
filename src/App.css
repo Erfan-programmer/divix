@@ -143,3 +143,9 @@ input, textarea, select {
 .leaflet-container {
   z-index: 2 !important;
 }
+
+
+.lazy-load-image-background{
+  height: 100% !important;
+  width: 100% !important;
+}

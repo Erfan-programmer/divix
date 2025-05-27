@@ -6,4 +6,5 @@
 
 html{
     font-family: IranYekan !important;
+    overflow-x: hidden !important;
 }

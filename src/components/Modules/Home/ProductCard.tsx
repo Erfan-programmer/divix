@@ -1,8 +1,6 @@
 import { useState } from "react";
-import {
-  FaHeart,
-  FaRegHeart,
-} from "react-icons/fa";
+import { LazyLoadImage } from "react-lazy-load-image-component";
+import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { toast, Toaster } from "react-hot-toast";
 import type { Product } from "../../../types/Product";
@@ -46,16 +44,19 @@ export default function ProductCard({
         return;
       }
 
-      const response = await fetch("https://admin.mydivix.com/api/v1/favorites", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          product_id: product.id,
-        }),
-      });
+      const response = await fetch(
+        "https://admin.mydivix.com/api/v1/favorites",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            product_id: product.id,
+          }),
+        }
+      );
 
       const data = await response.json();
 
@@ -65,7 +66,9 @@ export default function ProductCard({
           onToggleFavorite();
         }
         toast.success(
-          isFavorite ? "محصول از علاقه‌مندی‌ها حذف شد" : "محصول به علاقه‌مندی‌ها اضافه شد",
+          isFavorite
+            ? "محصول از علاقه‌مندی‌ها حذف شد"
+            : "محصول به علاقه‌مندی‌ها اضافه شد",
           {
             position: "top-center",
             duration: 2000,
@@ -120,16 +123,21 @@ export default function ProductCard({
         }}
       />
       <div className="relative h-48 sm:h-56 md:h-64">
-        <img
+        <LazyLoadImage
+          effect="blur"
           src={product.image as string}
           alt={product.title}
           className="object-cover h-full w-full"
         />
       </div>
       <div className="p-3 sm:p-4">
-        <span className="text-xs sm:text-sm text-[#6F1D1B]">{product.category}</span>
+        <span className="text-xs sm:text-sm text-[#6F1D1B]">
+          {product.category}
+        </span>
         <div className="flex justify-between items-center">
-          <h3 className="text-base sm:text-lg font-bold text-[#222] my-1 sm:my-2">{product.title}</h3>
+          <h3 className="text-base sm:text-lg font-bold text-[#222] my-1 sm:my-2">
+            {product.title}
+          </h3>
           <div className="flex flex-col items-end">
             <span className="text-sm sm:text-base text-[#6F1D1B] font-bold">
               {product.price.toLocaleString()} تومان

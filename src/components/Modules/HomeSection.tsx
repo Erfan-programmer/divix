@@ -1,12 +1,8 @@
 import React, { useEffect, useState } from "react";
-import {
-  FaStar,
-  FaTruck,
-  FaHandSparkles,
-  FaShieldAlt
-} from "react-icons/fa";
+import { FaStar, FaTruck, FaHandSparkles, FaShieldAlt } from "react-icons/fa";
 import { MdOutlineCategory } from "react-icons/md";
 import type { Category } from "./Header/Header";
+import { LazyLoadImage } from "react-lazy-load-image-component";
 
 const features = [
   {
@@ -44,7 +40,10 @@ const SkeletonLoader = () => {
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
             {[1, 2].map((item) => (
-              <div key={item} className="relative overflow-hidden rounded-xl sm:rounded-2xl">
+              <div
+                key={item}
+                className="relative overflow-hidden rounded-xl sm:rounded-2xl"
+              >
                 <div className="w-full h-[200px] sm:h-[250px] md:h-[300px] bg-[#FFF8E7] animate-pulse" />
               </div>
             ))}
@@ -61,13 +60,19 @@ const SkeletonLoader = () => {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
             {[1, 2, 3].map((item) => (
-              <div key={item} className="relative overflow-hidden rounded-xl sm:rounded-2xl shadow-lg">
+              <div
+                key={item}
+                className="relative overflow-hidden rounded-xl sm:rounded-2xl shadow-lg"
+              >
                 <div className="w-full h-[200px] sm:h-[250px] md:h-[300px] bg-[#FFF8E7] animate-pulse" />
                 <div className="absolute bottom-0 right-0 p-4 sm:p-5 md:p-6 w-full">
                   <div className="w-32 h-6 bg-white/20 rounded-lg animate-pulse mb-2" />
                   <div className="space-y-2">
                     {[1, 2, 3].map((subItem) => (
-                      <div key={subItem} className="w-24 h-4 bg-white/20 rounded-lg animate-pulse" />
+                      <div
+                        key={subItem}
+                        className="w-24 h-4 bg-white/20 rounded-lg animate-pulse"
+                      />
                     ))}
                   </div>
                 </div>
@@ -86,7 +91,10 @@ const SkeletonLoader = () => {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
             {[1, 2, 3, 4].map((item) => (
-              <div key={item} className="bg-[#F3C1A0] p-4 sm:p-5 md:p-6 rounded-xl sm:rounded-2xl">
+              <div
+                key={item}
+                className="bg-[#F3C1A0] p-4 sm:p-5 md:p-6 rounded-xl sm:rounded-2xl"
+              >
                 <div className="flex items-start gap-3 sm:gap-4">
                   <div className="w-12 h-12 bg-[#FFF1CC] rounded-full animate-pulse" />
                   <div className="flex-1">
@@ -126,7 +134,6 @@ export default function HomeSections() {
           (banner: any) => banner.group === "index_middle_banners"
         );
         setBanners(middleBanners);
-        console.log("middleBanners", data.result)
       }
     } catch (error) {
       console.error("Error fetching banners:", error);
@@ -143,11 +150,12 @@ export default function HomeSections() {
   const fetchCategories = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch("https://admin.mydivix.com/api/v1/categories");
+      const response = await fetch(
+        "https://admin.mydivix.com/api/v1/categories"
+      );
       const data = await response.json();
 
       if (data.success) {
-
         setCategories(data.result.data);
       }
     } catch (error) {
@@ -158,8 +166,8 @@ export default function HomeSections() {
   };
 
   useEffect(() => {
-    fetchCategories()
-  }, [])
+    fetchCategories();
+  }, []);
 
   if (isLoading) {
     return <SkeletonLoader />;
@@ -175,7 +183,8 @@ export default function HomeSections() {
 
             {banners.slice(2).map((banner: any) => (
               <div className="relative group overflow-hidden rounded-xl sm:rounded-2xl">
-                <img
+                <LazyLoadImage
+                  effect="blur"
                   src={`https://admin.mydivix.com/${banner?.image}`}
                   alt="بنر تخفیف‌های ویژه"
                   width={600}
@@ -201,8 +210,9 @@ export default function HomeSections() {
                 key={category.id}
                 className="group relative overflow-hidden rounded-xl sm:rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300"
               >
-                <img
-                  src={category.image || '/images/placeholder.png'}
+                <LazyLoadImage
+                  effect="blur"
+                  src={category.image || "/images/placeholder.png"}
                   alt={category.title}
                   className="w-full h-[200px] sm:h-[250px] md:h-[300px] object-cover transition-transform duration-500 group-hover:scale-110"
                 />
@@ -214,14 +224,17 @@ export default function HomeSections() {
                       </h3>
                     </div>
                     <ul className="space-y-1 sm:space-y-2">
-                      {category.categories && category.categories.map((subCategory: any, index: number) => (
-                        <li
-                          key={subCategory.id || index}
-                          className="text-xs sm:text-sm opacity-90 hover:opacity-100 transition-opacity"
-                        >
-                          {subCategory.title}
-                        </li>
-                      ))}
+                      {category.categories &&
+                        category.categories.map(
+                          (subCategory: any, index: number) => (
+                            <li
+                              key={subCategory.id || index}
+                              className="text-xs sm:text-sm opacity-90 hover:opacity-100 transition-opacity"
+                            >
+                              {subCategory.title}
+                            </li>
+                          )
+                        )}
                     </ul>
                   </div>
                 </div>

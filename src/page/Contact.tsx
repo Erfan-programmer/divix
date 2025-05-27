@@ -130,13 +130,16 @@ const ContactPage = () => {
     e.preventDefault();
     setIsSubmitting(true);
     
+    const abortController = new AbortController();
+    
     try {
       const response = await fetch('https://admin.mydivix.com/api/v1/contact', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(formData),
+        signal: abortController.signal
       });
 
       const data = await response.json();
@@ -153,11 +156,18 @@ const ContactPage = () => {
         toast.error('خطا در ارسال پیام');
       }
     } catch (error) {
+      if (error instanceof Error && error.name === 'AbortError') {
+        return;
+      }
       console.error('خطا در ارسال پیام:', error);
       toast.error('خطا در ارسال پیام');
     } finally {
       setIsSubmitting(false);
     }
+
+    return () => {
+      abortController.abort();
+    };
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {

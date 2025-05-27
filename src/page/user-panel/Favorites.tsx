@@ -9,6 +9,7 @@ import {
 } from "react-icons/fi";
 import { Link, useNavigate } from "react-router-dom";
 import { toast, Toaster } from "react-hot-toast";
+import { LazyLoadImage } from "react-lazy-load-image-component";
 
 interface Product {
   id: number;
@@ -46,7 +47,7 @@ const Favorites = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [productToDelete, setProductToDelete] = useState<number | null>(null);
 
-  const fetchFavorites = async (page: number) => {
+  const fetchFavorites = async (page: number, signal?: AbortSignal) => {
     try {
       setIsLoading(true);
       const token = localStorage.getItem("token");
@@ -58,6 +59,7 @@ const Favorites = () => {
             "x-api-key": "9anHzmriziuiUjNcwICqB7b1MDJa6xV3uQzOmZWy",
             Authorization: `Bearer ${token}`,
           },
+          signal,
         }
       );
 
@@ -84,6 +86,9 @@ const Favorites = () => {
         throw new Error("خطا در دریافت اطلاعات علاقه‌مندی‌ها");
       }
     } catch (err) {
+      if (err instanceof Error && err.name === "AbortError") {
+        return;
+      }
       setError(
         err instanceof Error
           ? err.message
@@ -162,7 +167,11 @@ const Favorites = () => {
   };
 
   useEffect(() => {
-    fetchFavorites(currentPage);
+    const abortController = new AbortController();
+    fetchFavorites(currentPage, abortController.signal);
+    return () => {
+      abortController.abort();
+    };
   }, [currentPage]);
 
   const handlePageChange = (page: number) => {
@@ -300,7 +309,8 @@ const Favorites = () => {
                   >
                     <td className="p-4">
                       <div className="relative w-16 h-16">
-                        <img
+                        <LazyLoadImage
+                          effect="blur"
                           src={product.image}
                           alt={product.title}
                           className="object-cover rounded-lg"

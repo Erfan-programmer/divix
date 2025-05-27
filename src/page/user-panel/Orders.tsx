@@ -52,14 +52,15 @@ const Orders = () => {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [showModal, setShowModal] = useState(false);
 
-  const fetchOrders = async (page: number) => {
+  const fetchOrders = async (page: number, signal?: AbortSignal) => {
     try {
       const response = await fetch(`https://admin.mydivix.com/api/v1/orders?per_page=10&page=${page}`, {
         headers: {
           'Accept': 'application/json',
           'x-api-key': '9anHzmriziuiUjNcwICqB7b1MDJa6xV3uQzOmZWy',
           'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
+        },
+        signal
       });
 
       if (!response.ok) {
@@ -75,6 +76,9 @@ const Orders = () => {
         throw new Error(data.message || 'خطا در دریافت سفارش‌ها');
       }
     } catch (err) {
+      if (err instanceof Error && err.name === 'AbortError') {
+        return;
+      }
       setError('خطا در دریافت سفارش‌ها');
       console.error('Error fetching orders:', err);
       toast.error('خطا در دریافت سفارش‌ها');
@@ -84,7 +88,12 @@ const Orders = () => {
   };
 
   useEffect(() => {
-    fetchOrders(currentPage);
+    const abortController = new AbortController();
+    fetchOrders(currentPage, abortController.signal);
+
+    return () => {
+      abortController.abort();
+    };
   }, [currentPage]);
 
   const handlePageChange = (page: number) => {

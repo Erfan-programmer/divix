@@ -10,7 +10,7 @@ const SearchPage: React.FC = () => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const fetchSearchResults = async () => {
+        const fetchSearchResults = async (signal?: AbortSignal) => {
             try {
                 setLoading(true);
                 const query = searchParams.get('q');
@@ -22,7 +22,8 @@ const SearchPage: React.FC = () => {
                 }
 
                 const response = await fetch(
-                    `https://admin.mydivix.com/api/v1/search/products?q=${encodeURIComponent(query)}&page=${page}`
+                    `https://admin.mydivix.com/api/v1/search/products?q=${encodeURIComponent(query)}&page=${page}`,
+                    { signal }
                 );
                 
                 const data: SearchResponse = await response.json();
@@ -33,6 +34,9 @@ const SearchPage: React.FC = () => {
 
                 setSearchResults(data);
             } catch (error) {
+                if (error instanceof Error && error.name === 'AbortError') {
+                    return;
+                }
                 console.error('Error fetching search results:', error);
                 toast.error(error instanceof Error ? error.message : 'خطا در دریافت نتایج جستجو');
                 setSearchResults(null);
@@ -41,7 +45,12 @@ const SearchPage: React.FC = () => {
             }
         };
 
-        fetchSearchResults();
+        const abortController = new AbortController();
+        fetchSearchResults(abortController.signal);
+
+        return () => {
+            abortController.abort();
+        };
     }, [searchParams]);
 
     if (loading) {

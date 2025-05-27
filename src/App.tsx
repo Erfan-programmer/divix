@@ -6,6 +6,7 @@ import {
 } from "react-router-dom";
 import MainLayout from "./components/Layout/MainLayout";
 import { CartProvider } from "./ContextApi/CartProvider";
+import "react-lazy-load-image-component/src/effects/blur.css";
 import Home from "./page/Home";
 import "swiper/swiper-bundle.css";
 import ProductsPage from "./components/Templates/Products/Products";
