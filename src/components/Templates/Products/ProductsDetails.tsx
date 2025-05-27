@@ -25,6 +25,7 @@ import {
 import { useParams } from "react-router-dom";
 import { useCart } from "../../../ContextApi/CartProvider";
 import { addToCart, removeFromCart, updateCartItemQuantity } from "./../../../utils/Cart"
+import type { ProductDetail } from '../../../types/Product';
 
 const StyledAccordion = styled(Accordion)(({ }) => ({
   border: "1px solid #fff1cc",
@@ -398,36 +399,34 @@ interface ProductImage {
   ordering: number;
 }
 
-interface ApiProduct {
-  id: number;
-  title: string;
-  title_en: string;
-  category_id: number;
-  image: string;
-  unit: string;
-  type: string;
-  price: number;
-  regular_price: number | null;
-  sale_price: number;
-  special: boolean;
-  description: string;
-  short_description: string;
-  brand_id: number;
-  images: ProductImage[];
-  category: string;
-  specificationGroups: any[];
-  link: string;
-  is_available: boolean;
-  prices: Price[];
-}
-
-interface ProductDetailResponse {
+interface ApiProductResponse {
   success: boolean;
   message: string;
-  result: ApiProduct;
+  result: {
+    id: number;
+    title: string;
+    title_en: string;
+    category_id: number;
+    image: string;
+    unit: string;
+    type: string;
+    price: number;
+    regular_price: number | null;
+    sale_price: number;
+    special: boolean;
+    description: string;
+    short_description: string;
+    brand_id: number;
+    images: ProductImage[];
+    category: string;
+    specificationGroups: any[];
+    link: string;
+    is_available: boolean;
+    prices: Price[];
+  };
 }
 
-interface ExtendedProductData extends ApiProduct {
+interface ExtendedProductData extends ProductDetail {
   brand: string;
   rating: number;
   sales: number;
@@ -435,6 +434,7 @@ interface ExtendedProductData extends ApiProduct {
   dateAdded: string;
   features: string[];
   discount?: number;
+  slug: string;
 }
 
 interface RelatedProduct {
@@ -587,10 +587,9 @@ export default function ProductsDetails() {
         const response = await fetch(
           `https://admin.mydivix.com/api/v1/products/${id}`
         );
-        const data: ProductDetailResponse = await response.json();
+        const data: ApiProductResponse = await response.json();
 
         if (data.success) {
-
           const firstPrice = data.result.prices[0];
           setSelectedPrice(firstPrice);
           await getProductCartCount(firstPrice.id);
@@ -604,25 +603,19 @@ export default function ProductsDetails() {
 
           await setProductData({
             ...data.result,
-            brand: `برند ${data.result.brand_id}`,
+            brand: "برند نمونه",
             rating: 4.5,
-            sales: 150,
-            features: [
-              "مقاومت بالا در برابر فشار",
-              "ساخته شده از مواد با کیفیت",
-              "گارانتی اصالت کالا",
-              "نصب آسان",
-              data.result.short_description,
-            ],
+            sales: 120,
+            features: ["ویژگی ۱", "ویژگی ۲", "ویژگی ۳"],
             inStock: data.result.is_available,
             dateAdded: new Date().toISOString(),
             discount: firstPrice?.discount || 0,
+            slug: data.result.title.replace(/\s+/g, '-').toLowerCase(),
           });
           setIsLoading(false);
-
         }
-      } catch (err) {
-      } finally {
+      } catch (error) {
+        console.error("Error fetching product:", error);
         setIsLoading(false);
       }
     };
@@ -1051,11 +1044,11 @@ export default function ProductsDetails() {
                             style={
                               group.type === "color" && attr
                                 ? {
-                                  backgroundColor: attr.value,
-                                  boxShadow: selectedAttributes[group.name] === attrName
-                                    ? '0 0 0 4px #fff1cc'
-                                    : '0 2px 4px rgba(0,0,0,0.1)'
-                                }
+                                    backgroundColor: attr.value ? attr.value : '#fff',
+                                    boxShadow: selectedAttributes[group.name] === attrName
+                                      ? '0 0 0 4px #fff1cc'
+                                      : '0 2px 4px rgba(0,0,0,0.1)'
+                                  }
                                 : undefined
                             }
                           >

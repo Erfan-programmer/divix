@@ -1,5 +1,10 @@
 import { useState, useEffect } from "react";
-import { FaSpinner, FaCheckCircle, FaClock, FaExclamationCircle } from "react-icons/fa";
+import {
+  FaSpinner,
+  FaCheckCircle,
+  FaClock,
+  FaExclamationCircle,
+} from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
@@ -41,31 +46,48 @@ export const TicketList = () => {
   const [totalPages, setTotalPages] = useState(1);
   const navigate = useNavigate();
 
-  const fetchTickets = async (page: number = 1) => {
+  const fetchTickets = async (page: number = 1, signal?: AbortSignal) => {
+    setIsLoading(true);
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`https://admin.mydivix.com/api/v1/tickets?page=${page}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          accept: "application/json",
-          "x-api-key": "9anHzmriziuiUjNcwICqB7b1MDJa6xV3uQzOmZWy",
-        },
-      });
+
+      const response = await fetch(
+        `https://admin.mydivix.com/api/v1/tickets?page=${page}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            accept: "application/json",
+            "x-api-key": "9anHzmriziuiUjNcwICqB7b1MDJa6xV3uQzOmZWy",
+          },
+          signal,
+        }
+      );
 
       const data: TicketResponse = await response.json();
       setTickets(data.data);
       setTotalPages(data.last_page);
       setCurrentPage(data.current_page);
-    } catch (error) {
-      toast.error("خطا در دریافت لیست تیکت‌ها");
+    } catch (error: any) {
+      if (error.name === "AbortError") {
+        // درخواست لغو شده
+        console.log("درخواست fetchTickets لغو شد");
+      } else {
+        toast.error("خطا در دریافت لیست تیکت‌ها");
+      }
     } finally {
       setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchTickets();
-  }, []);
+    const controller = new AbortController();
+
+    fetchTickets(currentPage, controller.signal);
+
+    return () => {
+      controller.abort();
+    };
+  }, [currentPage]);
 
   const getStatusIcon = (status: Ticket["status"]) => {
     switch (status) {
@@ -130,7 +152,9 @@ export const TicketList = () => {
         <div className="bg-[#FFF8E7] border border-[#7A4522]/10 rounded-lg p-6">
           {tickets.length === 0 ? (
             <div className="text-center py-8">
-              <p className="text-[#7A4522]/70">شما هنوز هیچ تیکتی ارسال نکرده‌اید</p>
+              <p className="text-[#7A4522]/70">
+                شما هنوز هیچ تیکتی ارسال نکرده‌اید
+              </p>
             </div>
           ) : (
             <>
@@ -142,7 +166,9 @@ export const TicketList = () => {
                     onClick={() => navigate(`/user-panel/tickets/${ticket.id}`)}
                   >
                     <div className="flex justify-between items-start mb-2">
-                      <h3 className="text-lg font-medium text-[#7A4522]">{ticket.subject}</h3>
+                      <h3 className="text-lg font-medium text-[#7A4522]">
+                        {ticket.subject}
+                      </h3>
                       <div className="flex items-center gap-2">
                         {getStatusIcon(ticket.status)}
                         <span className="text-sm text-[#7A4522]/70">
@@ -159,7 +185,9 @@ export const TicketList = () => {
                           : "اولویت پایین"}
                       </span>
                       <span className="text-[#7A4522]/50">
-                        {new Date(ticket.created_at).toLocaleDateString("fa-IR")}
+                        {new Date(ticket.created_at).toLocaleDateString(
+                          "fa-IR"
+                        )}
                       </span>
                     </div>
                   </div>
@@ -196,4 +224,4 @@ export const TicketList = () => {
   );
 };
 
-export default TicketList; 
+export default TicketList;

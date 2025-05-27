@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import L from "leaflet";
+
 import 'leaflet/dist/leaflet.css';
 import { FaMapMarkerAlt, FaPhone, FaEnvelope, FaClock, FaWhatsapp, FaInstagram, FaTelegram, FaTruck, FaHeadset, FaShieldAlt, FaCreditCard } from 'react-icons/fa';
 import { 
@@ -163,6 +165,12 @@ const ContactPage = () => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  const customIcon = new L.Icon({
+  iconUrl: "/images/location.png",  
+  iconSize: [32, 32],
+  iconAnchor: [16, 32],
+});
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#F3C1A0] to-white">
       <Toaster
@@ -308,7 +316,7 @@ const ContactPage = () => {
                   url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                   attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 />
-                <Marker position={[35.7219, 51.3347]}>
+                <Marker position={[35.7219, 51.3347]} icon={customIcon}>
                   <Popup>
                     فروگشاهی <br /> تهران، خیابان ولیعصر
                   </Popup>
