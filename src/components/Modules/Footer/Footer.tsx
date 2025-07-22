@@ -245,8 +245,8 @@ const Footer = () => {
       </div>
       <div className="bg-[#F3C1A0] text-center py-2">
         <p>طراحی شده توسط تیم برنامه نویسی EMV</p>
-{/*         <a href="https://jobto.ir" target="_blank" className="font-bold">Jobto</a>
-      </div> */}
+{/*    <a href="https://jobto.ir" target="_blank" className="font-bold">Jobto</a>  */}
+      </div>  
     </footer>
   );
 };
